@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Restaurant - <th:block th:text="${user?.nom ?: user?.username}"></th:block></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Dashboard Restaurant</h2>
+        <p th:if="${user != null}">
+            Bienvenue <strong th:text="${user.nom ?: user.username}">Restaurant</strong> !
+        </p>
+        <p th:if="${user != null and user.adresse != null}" th:text="'Adresse: ' + ${user.adresse}"></p>
+        <hr>
+        <p>
+            <a th:href="@{/restaurant/plats}" class="btn btn-info">Gérer mes plats</a>
+        </p>
+        <hr>
+        <p><a href="/logout" th:href="@{/logout}" class="btn btn-danger">Déconnexion</a></p>
+    </div>
+</body>
+</html>

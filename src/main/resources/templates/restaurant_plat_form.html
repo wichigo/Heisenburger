@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle ?: 'Formulaire Plat'}">Formulaire Plat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 th:text="${pageTitle ?: 'Gestion de Plat'}">Gestion de Plat</h2>
+
+    <form th:action="@{/restaurant/plats/save}" th:object="${plat}" method="post" class="needs-validation" novalidate>
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="form-group">
+            <label for="nom">Nom du plat:</label>
+            <input type="text" th:field="*{nom}" class="form-control" id="nom" placeholder="Ex: Pizza Margherita" required/>
+            <div class="invalid-feedback">Le nom du plat est requis.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea th:field="*{description}" class="form-control" id="description" rows="3" placeholder="Ex: Sauce tomate, mozzarella, basilic"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="prix">Prix (€):</label>
+            <input type="number" step="0.01" th:field="*{prix}" class="form-control" id="prix" placeholder="Ex: 12.50" required/>
+            <div class="invalid-feedback">Le prix est requis et doit être un nombre valide.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="disponible">Disponible:</label>
+            <select th:field="*{disponible}" class="form-control" id="disponible">
+                <option th:value="true">Oui</option>
+                <option th:value="false">Non</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="imageUrl">URL de l'image:</label>
+            <input type="text" th:field="*{imageUrl}" class="form-control" id="imageUrl" placeholder="Ex: https://example.com/image.jpg"/>
+            <small class="form-text text-muted">Laissez vide si pas d'image.</small>
+        </div>
+
+        <button type="submit" class="btn btn-success">Enregistrer le plat</button>
+        <a th:href="@{/restaurant/plats}" class="btn btn-secondary">Annuler et retourner à la liste</a>
+    </form>
+</div>
+
+<script>
+// Script pour la validation Bootstrap (optionnel mais recommandé)
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+
+</body>
+</html>
