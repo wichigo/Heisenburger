@@ -45,7 +45,7 @@ public class PlatController {
         List<Plat> plats = platRepository.findByRestaurant(restaurant); // Récupère les plats du restaurant [cite: 65]
         model.addAttribute("plats", plats);
         model.addAttribute("restaurantName", restaurant.getNom()); // Pour afficher le nom du restaurant
-        return "restaurant_plats"; // Vue pour lister les plats [cite: 65]
+        return "restaurant/restaurant_plats"; // Vue pour lister les plats [cite: 65]
     }
 
     // GET /restaurant/plats/new : Afficher le formulaire pour ajouter un nouveau plat
@@ -58,7 +58,7 @@ public class PlatController {
 
         model.addAttribute("plat", new Plat()); // Objet plat vide pour le formulaire [cite: 66]
         model.addAttribute("pageTitle", "Ajouter un nouveau plat");
-        return "restaurant_plat_form"; // Vue du formulaire [cite: 66]
+        return "restaurant/restaurant_plat_form"; // Vue du formulaire [cite: 66]
     }
 
     // POST /restaurant/plats/save : Sauvegarder un plat (nouveau ou modifié)
@@ -100,7 +100,7 @@ public class PlatController {
             }
             model.addAttribute("plat", plat);
             model.addAttribute("pageTitle", "Modifier le plat : " + plat.getNom());
-            return "restaurant_plat_form"; // Réutilise la même vue de formulaire [cite: 70]
+            return "restaurant/restaurant_plat_form"; // Réutilise la même vue de formulaire [cite: 70]
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Plat non trouvé.");
             return "redirect:/restaurant/plats"; // Redirige si le plat n'existe pas

@@ -63,7 +63,7 @@ public class AuthController {
             return "redirect:/login"; // Redirige si non autorisé
         }
         model.addAttribute("user", userAttribute);
-        return "admin_dashboard";
+        return "admin/admin_dashboard";
     }
 
     // Tableau de bord Client
@@ -74,7 +74,7 @@ public class AuthController {
             return "redirect:/login";
         }
         model.addAttribute("user", userAttribute);
-        return "client_dashboard";
+        return "client/client_dashboard";
     }
 
     // Tableau de bord Restaurant
@@ -85,7 +85,7 @@ public class AuthController {
             return "redirect:/login";
         }
         model.addAttribute("user", userAttribute);
-        return "restaurant_dashboard";
+        return "restaurant/restaurant_dashboard";
     }
 
     // L'ancien /dashboard n'est plus directement utilisé, mais on peut le laisser ou le supprimer.
