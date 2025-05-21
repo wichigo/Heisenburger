@@ -11,14 +11,14 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    public boolean authenticate(String username, String password) {
-        return userRepository.findByUsername(username)
+    public boolean authenticate(String email, String password) {
+        return userRepository.findByEmail(email)
                              .map(user -> user.getPassword().equals(password))
                              .orElse(false);
     }
 
-    public User findUser(String username) {
-        return userRepository.findByUsername(username)
+    public User findUser(String email) {
+        return userRepository.findByEmail(email)
                              .orElse(null);
     }
 }

@@ -4,7 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("CLIENT") // Valeur pour la colonne user_type
+@DiscriminatorValue("CLIENT") // Valeur pour la colonne role
 public class Client extends User {
 
     private String telephone;
@@ -13,8 +13,8 @@ public class Client extends User {
         super();
     }
 
-    public Client(String username, String password, String telephone) {
-        super(username, password);
+    public Client(String email, String password, String telephone) {
+        super(email, password);
         this.telephone = telephone;
     }
 

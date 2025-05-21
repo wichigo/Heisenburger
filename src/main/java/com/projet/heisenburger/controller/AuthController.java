@@ -29,13 +29,23 @@ public class AuthController {
         return "login";
     }
 
+    @GetMapping("/client_inscription")
+    public String registerForm() {
+        return "/client/client_inscription";
+    }
+
+    @GetMapping("/restaurant_inscription")
+    public String proRegisterForm() {
+        return "/restaurant/restaurant_inscription";
+    }
+
     @PostMapping("/login")
-    public String login(@RequestParam String username,
+    public String login(@RequestParam String email,
                         @RequestParam String password,
                         HttpSession session,
                         Model model) {
-        if (authService.authenticate(username, password)) {
-            User user = authService.findUser(username);
+        if (authService.authenticate(email, password)) {
+            User user = authService.findUser(email);
             session.setAttribute("user", user); // Stocke l'objet User (Admin, Client, ou Restaurant)
 
             // Redirection en fonction du type d'utilisateur
@@ -64,6 +74,26 @@ public class AuthController {
         }
         model.addAttribute("user", userAttribute);
         return "admin/admin_dashboard";
+    }
+    @GetMapping("/admin_gestion_restaurant")
+    public String adminGestionRestaurant(HttpSession session, Model model) {
+        Object userAttribute = session.getAttribute("user");
+        return "admin/admin_gestion_restaurant";
+    }
+    @GetMapping("/admin_gestion_client")
+    public String adminGestionClient(HttpSession session, Model model) {
+        Object userAttribute = session.getAttribute("user");
+        return "admin/admin_gestion_client";
+    }
+    @GetMapping("/admin_gestion_commande")
+    public String adminGestionCommande(HttpSession session, Model model){
+        Object userAttribute = session.getAttribute("user");
+        return "admin/admin_gestion_commande";
+    }
+    @GetMapping("/admin_profil")
+    public String adminProfil(HttpSession session, Model model){
+        Object userAttribute = session.getAttribute("user");
+        return "admin/admin_profil";
     }
 
     // Tableau de bord Client

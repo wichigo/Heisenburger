@@ -9,7 +9,7 @@
     <div class="container mt-5">
         <h2>Dashboard Client</h2>
         <p th:if="${user != null}">
-            Bienvenue Client <strong th:text="${user.username}"></strong> !
+            Bienvenue Client <strong th:text="${user.email}"></strong> !
         </p>
         <p><a href="/logout" th:href="@{/logout}" class="btn btn-danger">Déconnexion</a></p>
     </div>

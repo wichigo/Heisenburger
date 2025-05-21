@@ -9,7 +9,7 @@
     <div class="container mt-5">
         <h2>Dashboard Restaurant</h2>
         <p th:if="${user != null}">
-            Bienvenue <strong th:text="${user.nom ?: user.username}"></strong> ! </p>
+            Bienvenue <strong th:text="${user.nom ?: user.email}"></strong> ! </p>
         <p><a href="/logout" th:href="@{/logout}" class="btn btn-danger">Déconnexion</a></p>
     </div>
 </body>

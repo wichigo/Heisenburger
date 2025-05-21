@@ -3,16 +3,17 @@ package com.projet.heisenburger.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users") // Conserve le nom de table
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Stratégie d'héritage
-@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING) // Colonne pour distinguer les types d'utilisateurs
+@Table(name = "login") // Conserve le nom de table
+@Inheritance(strategy = InheritanceType.JOINED) // Stratégie d'héritage
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING) // Colonne pour distinguer les types d'utilisateurs
 public abstract class User { // La classe devient abstraite
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_login")
     protected Long id; // Passage en protected pour l'accès par les sous-classes
 
-    protected String username; // Passage en protected
+    protected String email; // Passage en protected
     protected String password; // Passage en protected
 
     // Constructeur par défaut (requis par JPA)
@@ -20,8 +21,8 @@ public abstract class User { // La classe devient abstraite
     }
 
     // Constructeur pour les sous-classes
-    public User(String username, String password) {
-        this.username = username;
+    public User(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
@@ -30,8 +31,8 @@ public abstract class User { // La classe devient abstraite
         return id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
     public String getPassword() {
@@ -43,8 +44,8 @@ public abstract class User { // La classe devient abstraite
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPassword(String password) {
@@ -55,7 +56,7 @@ public abstract class User { // La classe devient abstraite
     public String toString() {
         return "User{" +
                "id=" + id +
-               ", username='" + username + '\'' +
+               ", email='" + email + '\'' +
                // Ne pas inclure le mot de passe
                ", userType='" + this.getClass().getAnnotation(DiscriminatorValue.class).value() + '\'' +
                '}';

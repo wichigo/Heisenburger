@@ -1,6 +1,7 @@
 package com.projet.heisenburger.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -14,6 +15,7 @@ public class Restaurant extends User {
     private String nom;
     private String adresse;
     private String horaires;
+    @Column(name = "logo_url")
     private String logo;
     private String statut;
 
@@ -27,8 +29,8 @@ public class Restaurant extends User {
         super();
     }
 
-    public Restaurant(String username, String password, String nom, String adresse, String horaires, String logo, String statut) {
-        super(username, password);
+    public Restaurant(String email, String password, String nom, String adresse, String horaires, String logo, String statut) {
+        super(email, password);
         this.nom = nom;
         this.adresse = adresse;
         this.horaires = horaires;
