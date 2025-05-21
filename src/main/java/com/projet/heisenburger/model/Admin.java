@@ -4,7 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("ADMIN") // Valeur pour la colonne user_type
+@DiscriminatorValue("ADMIN") // Valeur pour la colonne role
 public class Admin extends User {
 
     // Pas d'attribut supplémentaire pour Admin dans cet exemple [cite: 32]
@@ -13,7 +13,7 @@ public class Admin extends User {
         super();
     }
 
-    public Admin(String username, String password) {
-        super(username, password);
+    public Admin(String email, String password) {
+        super(email, password);
     }
 }
