@@ -29,7 +29,8 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
             width: 350px;
             position: absolute;
-            right: 50px;
+            right: 25%;
+            bottom: 19%;
         }
 
         .restaurant-button {
@@ -44,6 +45,14 @@
             left: 15%;
             flex: 1;
         }
+
+        .logo{
+            width: 9%;
+            position : absolute;
+            top: 12%;
+            left: 62%;
+        }
+        
     </style>
 </head>
 <body>
@@ -53,18 +62,24 @@
         <a href="/inscription_restaurant" th:href="@{/inscription_restaurant}" class="btn btn-primary">Inscription restaurant</a>
     </div>
 
+
+
+    </div>
+
+    
+
     <!-- Conteneur qui contient à la fois l'image et la boîte de connexion -->
     <div class="container-flex">
         <!-- Image en dehors de la boîte de connexion -->
         <img src="/images/heisenbergslipweb.jpg" alt="heisenberg" class="login-image">
-
+        <img src="/images/Heisenberg.svg" alt="heisenberg" class="logo">
         <!-- Formulaire de connexion -->
         <div class="login-box">
             <h2 class="text-center">Connexion</h2>
             <form method="post" th:action="@{/login}">
                 <div class="form-group">
-                    <label for="username">Nom d'utilisateur:</label>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Nom d'utilisateur" required autofocus/>
+                    <label for="email">Nom d'utilisateur:</label>
+                    <input type="text" id="email" name="email" class="form-control" placeholder="Email" required autofocus/>
                 </div>
                 <div class="form-group">
                     <label for="password">Mot de passe:</label>
