@@ -56,9 +56,9 @@ public abstract class User { // La classe devient abstraite
     public String toString() {
         return "User{" +
                "id=" + id +
-               ", email='" + email + '\'' +
+               ", email='" + email + "" +
                // Ne pas inclure le mot de passe
-               ", userType='" + this.getClass().getAnnotation(DiscriminatorValue.class).value() + '\'' +
+               ", userType='" + this.getClass().getAnnotation(DiscriminatorValue.class).value() + "" +
                '}';
     }
 }
