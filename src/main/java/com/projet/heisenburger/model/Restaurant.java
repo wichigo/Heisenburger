@@ -44,7 +44,6 @@ public class Restaurant extends User {
 
     public Restaurant(String email, String password, String nom, String description, String adresse, int telephone, String logoUrl, String statut, LocalDateTime date_inscription, String horaires) {
         super(email, password);
-        this.id_restaurant = id_restaurant;
         this.nom = nom;
         this.description = description;
         this.adresse = adresse;
