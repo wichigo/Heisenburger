@@ -136,9 +136,12 @@
                 <tr th:each="commande : ${commandes}">
                     <td th:text="${commande.idCommande}"></td>
                     <td>
-                        <a class="nav-link btn-custom-gray" href="#"
-                        th:href="@{/admin_gestion_client} + '?idClient=' + ${commande.client.idClient}"
-                        th:text="${commande.client != null ? commande.client.idClient : 'N/A'}" ></a>
+                        <a th:if="${commande.client != null}"
+                           class="nav-link btn-custom-gray"
+                           th:href="@{/admin_gestion_client(clientId=${commande.client.id})}"
+                           th:text="${commande.client.id}">
+                        </a>
+                        <span th:if="${commande.client == null}">N/A</span>
                     </td>
                     <td th:text="${commande.restaurant != null ? commande.restaurant.idRestaurant : 'N/A'}"></td>
                     <td th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></td>

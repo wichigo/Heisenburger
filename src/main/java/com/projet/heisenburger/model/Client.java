@@ -15,8 +15,8 @@ import jakarta.persistence.Table;
 
 public class Client extends User {
 
-    @Column(name = "id_client", insertable=false, updatable=false)
-    private int id_client;
+
+
     private String nom;
     private String prenom;
     private String adresse;
@@ -39,15 +39,6 @@ public class Client extends User {
         this.telephone = telephone;
         this.date_inscription = LocalDateTime.now();
 
-    }
-
-
-    public int getIdClient() {
-        return id_client;
-    }
-
-    public void setIdClient(int id_client) {
-        this.id_client = id_client;
     }
 
     public String getNom() {
