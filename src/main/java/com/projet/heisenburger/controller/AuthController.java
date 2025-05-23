@@ -4,14 +4,25 @@ import com.projet.heisenburger.model.Admin;
 import com.projet.heisenburger.model.Client;
 import com.projet.heisenburger.model.Restaurant;
 import com.projet.heisenburger.model.User;
+import com.projet.heisenburger.repository.CommandeRepository;
+import com.projet.heisenburger.repository.RestaurantRepository;
+import com.projet.heisenburger.repository.UserRepository;
 import com.projet.heisenburger.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.projet.heisenburger.model.Commande;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -19,44 +30,141 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private CommandeRepository commandeRepository;
+
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
     @GetMapping("/")
     public String home() {
-        return "home"; // Page d'accueil (inchangée pour l'instant)
+        return "home";
     }
 
     @GetMapping("/login")
-    public String loginForm() {
+    public String loginForm(Model model) {
         return "login";
     }
 
+    // GET mapping for client registration form
     @GetMapping("/client_inscription")
-    public String registerForm() {
+    public String clientRegisterForm(Model model) { // Renommé pour clarté et ajout de Model
+        model.addAttribute("client", new Client()); // Fournir un objet Client vide pour le form binding
         return "/client/client_inscription";
     }
 
+    // POST mapping to handle client registration
+    @PostMapping("/client/register")
+    public String registerClient(@ModelAttribute("client") Client client,
+                                 @RequestParam("confirmPassword") String confirmPassword,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+
+        // 1. Validate passwords
+        if (client.getPassword() == null || client.getPassword().isEmpty() || !client.getPassword().equals(confirmPassword)) {
+            model.addAttribute("error", "Les mots de passe ne correspondent pas ou sont vides.");
+            // model.addAttribute("client", client); // Renvoyer le client avec les données saisies
+            return "/client/client_inscription";
+        }
+
+        // 2. Check if email already exists
+        Optional<User> existingUser = userRepository.findByEmail(client.getEmail());
+        if (existingUser.isPresent()) {
+            model.addAttribute("error", "Un compte existe déjà avec cet email.");
+            // model.addAttribute("client", client);
+            return "/client/client_inscription";
+        }
+
+        // 3. Set default values for the new client
+        client.setStatut("actif"); // Les clients sont actifs par défaut à l'inscription
+        client.setDateInscription(LocalDateTime.now());
+        // Le rôle "CLIENT" est géré par @DiscriminatorValue sur l'entité Client
+
+        try {
+            // 4. Save the client
+            // Ceci enregistrera dans 'login' (partie User) et 'client' (partie Client)
+            // id_login (User.id) sera généré et défini.
+            // id_client sera également défini (et sera égal à id_login grâce à @PrimaryKeyJoinColumn)
+            User savedClient = userRepository.save(client); // Save using UserRepository
+
+            redirectAttributes.addFlashAttribute("successMessage", "Inscription réussie " +
+                    ((Client) savedClient).getPrenom() + "! Vous pouvez maintenant vous connecter.");
+            return "redirect:/login"; // Rediriger vers la page de connexion après une inscription réussie
+
+        } catch (Exception e) {
+            // Logger l'exception : e.printStackTrace(); ou utiliser un logger
+            model.addAttribute("error", "Une erreur est survenue lors de l'inscription: " + e.getMessage());
+            // model.addAttribute("client", client);
+            return "/client/client_inscription";
+        }
+    }
+
+
+    // GET mapping for restaurant registration form
     @GetMapping("/restaurant_inscription")
-    public String proRegisterForm() {
+    public String proRegisterForm(Model model) {
+        model.addAttribute("restaurant", new Restaurant());
         return "/restaurant/restaurant_inscription";
     }
+
+    // POST mapping to handle restaurant registration (précédemment ajouté)
+    @PostMapping("/restaurant/register")
+    public String registerRestaurant(@ModelAttribute("restaurant") Restaurant restaurant,
+                                     @RequestParam("confirmPassword") String confirmPassword,
+                                     Model model,
+                                     RedirectAttributes redirectAttributes) {
+
+        if (restaurant.getPassword() == null || restaurant.getPassword().isEmpty() || !restaurant.getPassword().equals(confirmPassword)) {
+            model.addAttribute("error", "Les mots de passe ne correspondent pas ou sont vides.");
+            return "/restaurant/restaurant_inscription";
+        }
+        Optional<User> existingUser = userRepository.findByEmail(restaurant.getEmail());
+        if (existingUser.isPresent()) {
+            model.addAttribute("error", "Un compte existe déjà avec cet email.");
+            return "/restaurant/restaurant_inscription";
+        }
+        restaurant.setStatut("inactif");
+        restaurant.setDateInscription(LocalDateTime.now());
+        try {
+            Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Inscription réussie pour le restaurant " + savedRestaurant.getNom() + "! Votre compte est en attente d'activation.");
+            return "redirect:/login";
+        } catch (Exception e) {
+            model.addAttribute("error", "Une erreur est survenue lors de l'inscription: " + e.getMessage());
+            return "/restaurant/restaurant_inscription";
+        }
+    }
+
 
     @PostMapping("/login")
     public String login(@RequestParam String email,
                         @RequestParam String password,
                         HttpSession session,
-                        Model model) {
+                        Model model, // Ajouté pour pouvoir utiliser redirectAttributes dans les autres méthodes
+                        RedirectAttributes redirectAttributes) { // Ajouté
         if (authService.authenticate(email, password)) {
             User user = authService.findUser(email);
-            session.setAttribute("user", user); // Stocke l'objet User (Admin, Client, ou Restaurant)
+            session.setAttribute("user", user);
 
-            // Redirection en fonction du type d'utilisateur
             if (user instanceof Admin) {
                 return "redirect:/admin/dashboard";
             } else if (user instanceof Client) {
                 return "redirect:/client/dashboard";
             } else if (user instanceof Restaurant) {
-                return "redirect:/restaurant/dashboard";
+                Restaurant resto = (Restaurant) user;
+                if ("actif".equalsIgnoreCase(resto.getStatut())) {
+                    return "redirect:/restaurant/dashboard";
+                } else {
+                    session.invalidate();
+                    redirectAttributes.addFlashAttribute("error", "Votre compte restaurant est '" + (resto.getStatut() != null ? resto.getStatut() : "inconnu") + "' et n'est pas encore activé. Veuillez contacter l'administrateur.");
+                    return "redirect:/login";
+                }
             }
-            // Fallback si le type n'est pas géré (ne devrait pas arriver avec les types définis)
             model.addAttribute("error", "Type d'utilisateur inconnu !");
             return "login";
         } else {
@@ -65,42 +173,12 @@ public class AuthController {
         }
     }
 
-    // Tableau de bord Admin
-    @GetMapping("/admin/dashboard")
-    public String adminDashboard(HttpSession session, Model model) {
-        Object userAttribute = session.getAttribute("user");
-        if (!(userAttribute instanceof Admin)) { // Vérifie si l'utilisateur en session est un Admin
-            return "redirect:/login"; // Redirige si non autorisé
-        }
-        model.addAttribute("user", userAttribute);
-        return "admin/admin_dashboard";
-    }
-    @GetMapping("/admin_gestion_restaurant")
-    public String adminGestionRestaurant(HttpSession session, Model model) {
-        Object userAttribute = session.getAttribute("user");
-        return "admin/admin_gestion_restaurant";
-    }
-    @GetMapping("/admin_gestion_client")
-    public String adminGestionClient(HttpSession session, Model model) {
-        Object userAttribute = session.getAttribute("user");
-        return "admin/admin_gestion_client";
-    }
-    @GetMapping("/admin_gestion_commande")
-    public String adminGestionCommande(HttpSession session, Model model){
-        Object userAttribute = session.getAttribute("user");
-        return "admin/admin_gestion_commande";
-    }
-    @GetMapping("/admin_profil")
-    public String adminProfil(HttpSession session, Model model){
-        Object userAttribute = session.getAttribute("user");
-        return "admin/admin_profil";
-    }
 
     // Tableau de bord Client
     @GetMapping("/client/dashboard")
     public String clientDashboard(HttpSession session, Model model) {
         Object userAttribute = session.getAttribute("user");
-        if (!(userAttribute instanceof Client)) { // Vérifie si l'utilisateur en session est un Client
+        if (!(userAttribute instanceof Client)) {
             return "redirect:/login";
         }
         model.addAttribute("user", userAttribute);
@@ -109,28 +187,39 @@ public class AuthController {
 
     // Tableau de bord Restaurant
     @GetMapping("/restaurant/dashboard")
-    public String restaurantDashboard(HttpSession session, Model model) {
+    public String restaurantDashboard(HttpSession session, Model model, RedirectAttributes redirectAttributes) { // Ajouté RedirectAttributes
         Object userAttribute = session.getAttribute("user");
-        if (!(userAttribute instanceof Restaurant)) { // Vérifie si l'utilisateur en session est un Restaurant
+        if (!(userAttribute instanceof Restaurant)) {
             return "redirect:/login";
         }
-        model.addAttribute("user", userAttribute);
+        Restaurant restaurant = (Restaurant) userAttribute;
+         if (!"actif".equalsIgnoreCase(restaurant.getStatut())) {
+            session.invalidate();
+            redirectAttributes.addFlashAttribute("error", "Votre compte restaurant est '" + (restaurant.getStatut() != null ? restaurant.getStatut() : "inconnu") + "' et n'est pas encore activé.");
+            return "redirect:/login";
+        }
+        model.addAttribute("user", restaurant);
         return "restaurant/restaurant_dashboard";
     }
 
-    // L'ancien /dashboard n'est plus directement utilisé, mais on peut le laisser ou le supprimer.
-    // Pour éviter les erreurs 404 si des liens existent, on peut le rediriger.
     @GetMapping("/dashboard")
-    public String redirectToTypedDashboard(HttpSession session) {
+    public String redirectToTypedDashboard(HttpSession session, RedirectAttributes redirectAttributes) {
         Object userAttribute = session.getAttribute("user");
         if (userAttribute instanceof Admin) {
             return "redirect:/admin/dashboard";
         } else if (userAttribute instanceof Client) {
             return "redirect:/client/dashboard";
         } else if (userAttribute instanceof Restaurant) {
-            return "redirect:/restaurant/dashboard";
+             Restaurant resto = (Restaurant) userAttribute;
+            if ("actif".equalsIgnoreCase(resto.getStatut())) {
+                return "redirect:/restaurant/dashboard";
+            } else {
+                session.invalidate();
+                redirectAttributes.addFlashAttribute("error", "Votre compte restaurant est '" + (resto.getStatut() != null ? resto.getStatut() : "inconnu") + "' et n'est pas encore activé.");
+                return "redirect:/login";
+            }
         }
-        return "redirect:/login"; // Si pas connecté ou type inconnu
+        return "redirect:/login";
     }
 
 

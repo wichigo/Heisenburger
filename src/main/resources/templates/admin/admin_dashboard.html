@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -68,7 +68,7 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
             <img src="path/to/your/logo.png" alt="Logo Heisenburger">
-            </a>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -80,12 +80,11 @@
                 <a class="nav-link btn-custom-gray" href="#">statistiques</a>
             </div>
             <p th:if="${user != null}">
-                Bienvenue Admin <strong th:text="${user.email}"></strong> !
+                Bienvenue Admin <strong th:text="${user.nom} + ' ' + ${user.prenom}"></strong> !
             </p>
             <div class="navbar-nav ms-auto">
                  <a class="nav-link btn-custom-gray" href="#">profil</a>
                 <a href="/logout" th:href="@{/logout}" class="btn btn-danger">Déconnexion</a>
-    </div>
             </div>
         </div>
     </div>
@@ -101,17 +100,114 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8 mb-3 mb-lg-0">
-            <div class="content-block main-content-area">
-                <span>graph</span>
-            </div>
+        <div class="container mt-4">
+    <h3>Liste des Commandes</h3>
+    <form th:action="@{/admin/dashboard}" method="get" class="row g-3 mb-3 align-items-center">
+        <div class="col-auto">
+        <label for="statutCommandeSearch" class="visually-hidden">Statut</label>
+        <select class="form-select" id="statutCommandeSearch" name="statutCommande">
+            <option value="" th:selected="${currentStatutCommande == null || currentStatutCommande.isEmpty()}">Tous statuts</option>
+            <option value="nouvelle" th:selected="${currentStatutCommande == 'nouvelle'}">nouvelles</option>
+            <option value="en_preparation" th:selected="${currentStatutCommande == 'en_preparation'}">en preparation</option>
+            <option value="prete" th:selected="${currentStatutCommande == 'prete'}">prêtes</option>
+            <option value="en_livraison" th:selected="${currentStatutCommande == 'en_livraison'}">en livraison</option>
+            <option value="livree" th:selected="${currentStatutCommande == 'livree'}">livrées</option>
+        </select>
         </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </div> 
+    </form>
 
-        <div class="col-lg-4">
-            <div class="content-block sidebar-content-area">
-                <span>restos ouverts par code postal</span>
+    <div th:if="${commandes != null && !commandes.isEmpty()}">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID Commande</th>
+                    <th>ID Client</th>
+                    <th>ID Restaurant</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Montant Total</th>
+                    <th>Adresse Livraison</th>
+                    </tr>
+            </thead>
+            <tbody>
+                <tr th:each="commande : ${commandes}">
+                    <td th:text="${commande.idCommande}"></td>
+                    <td>
+                        <a class="nav-link btn-custom-gray" href="#"
+                        th:href="@{/admin_gestion_client} + '?idClient=' + ${commande.client.idClient}"
+                        th:text="${commande.client != null ? commande.client.idClient : 'N/A'}" ></a>
+                    </td>
+                    <td th:text="${commande.restaurant != null ? commande.restaurant.idRestaurant : 'N/A'}"></td>
+                    <td th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${commande.statut}"></td>
+                    <td th:text="${#numbers.formatDecimal(commande.montantTotal, 1, 'COMMA', 2, 'POINT')} + ' €'"></td>
+                    <td th:text="${commande.adresseLivraison}"></td>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="container mt-4">
+        <h3>Gestion des Restaurants</h3>
+
+        <form th:action="@{/admin/dashboard}" method="get" class="row g-3 mb-3 align-items-center">
+            <div class="col-auto">
+                <label for="codePostalSearch" class="visually-hidden">Code Postal</label>
+                <input type="text" class="form-control" id="codePostalSearch" name="codePostal"
+                    placeholder="Filtrer par Code Postal" th:value="${currentCodePostal}">
             </div>
+            <div class="col-auto">
+                <label for="statutRestaurantSearch" class="visually-hidden">Statut</label>
+                <select class="form-select" id="statutRestaurantSearch" name="statutRestaurant">
+                    <option value="" th:selected="${currentStatutRestaurant == null || currentStatutRestaurant.isEmpty()}">Tous statuts</option>
+                    <option value="actif" th:selected="${currentStatutRestaurant == 'actif'}">actif</option>
+                    <option value="inactif" th:selected="${currentStatutRestaurant == 'inactif'}">inactif</option>
+                    </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </div>
+        </form>
+
+        <h4>Restaurants (<span th:text="${currentStatutRestaurant ?: 'Tous'}"></span><span th:if="${currentCodePostal}" th:text="' - CP: ' + ${currentCodePostal}"></span>)</h4>
+        <div th:if="${restaurants != null && !restaurants.isEmpty()}">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID Restaurant</th>
+                        <th>Nom</th>
+                        <th>Adresse</th>
+                        <th>Téléphone</th>
+                        <th>Statut</th>
+                        <th>Horaires</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="restaurant : ${restaurants}">
+                        <td th:text="${restaurant.idRestaurant}"></td>
+                        <td>
+                            <a class="nav-link btn-custom-gray" href="#" 
+                            th:href="@{/admin_gestion_restaurant} + '?idRestaurant=' + ${restaurant.idRestaurant}" 
+                            th:text="${restaurant.nom}" ></a>
+                        </td>
+                        <td th:text="${restaurant.adresse}"></td>
+                        <td th:text="${restaurant.telephone}"></td>
+                        <td th:text="${restaurant.statut}"></td>
+                        <td th:text="${restaurant.horaires}"></td>
+                        </tr>
+                </tbody>
+            </table>
         </div>
+        <div th:if="${restaurants == null || restaurants.isEmpty()}">
+            <p>Aucun restaurant ne correspond aux critères actuels.</p>
+        </div>
+    </div>
+    <div th:if="${commandes == null || commandes.isEmpty()}">
+        <p>Aucune commande à afficher pour le moment.</p>
+    </div>
+</div>
     </div>
 </div>
 

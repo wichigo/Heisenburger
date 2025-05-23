@@ -5,46 +5,79 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "restaurant")
 @DiscriminatorValue("RESTAURANT")
+
 public class Restaurant extends User {
 
+    @Column(name = "id_restaurant", insertable=false, updatable=false)
+    private int idRestaurant;
     private String nom;
+    private String description;
     private String adresse;
-    private String horaires;
+    private int telephone;
     @Column(name = "logo_url")
-    private String logo;
+    private String logoUrl;
     private String statut;
+    private LocalDateTime date_inscription;
+    private String horaires;
+
+
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER) // fetch = FetchType.EAGER peut simplifier pour l'instant, sinon LAZY et gérer la session/transaction
+    private List<Plat> plats = new ArrayList<>(); // Décommenté et initialisé
 
     // mappedBy="restaurant" indique que l'entité Plat gère la relation (via son champ 'restaurant')
     // CascadeType.ALL: les opérations (persist, merge, remove, refresh, detach) sur Restaurant sont propagées à Plats.
     // orphanRemoval=true: si un Plat est retiré de la liste 'plats' du Restaurant, il sera supprimé de la BDD.
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Plat> plats = new ArrayList<>(); // Initialisation de la liste
+    // @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private List<Plat> plats = new ArrayList<>(); // Initialisation de la liste
 
     public Restaurant() {
         super();
     }
 
-    public Restaurant(String email, String password, String nom, String adresse, String horaires, String logo, String statut) {
+    public Restaurant(String email, String password, String nom, String description, String adresse, int telephone, String logoUrl, String statut, LocalDateTime date_inscription, String horaires) {
         super(email, password);
         this.nom = nom;
+        this.description = description;
         this.adresse = adresse;
-        this.horaires = horaires;
-        this.logo = logo;
+        this.telephone = telephone;
+        this.logoUrl = logoUrl;
         this.statut = statut;
-    } //
+        this.date_inscription = date_inscription;
+        this.horaires = horaires;
+    }
 
-    // Getters et Setters pour les attributs spécifiques à Restaurant
+    public int getIdRestaurant() {
+        return idRestaurant;
+    }
+
+    public void setIdRestaurant(int idRestaurant) {
+        this.idRestaurant = idRestaurant;
+    }
+
     public String getNom() {
         return nom;
     }
 
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getAdresse() {
@@ -55,20 +88,20 @@ public class Restaurant extends User {
         this.adresse = adresse;
     }
 
-    public String getHoraires() {
-        return horaires;
+    public int getTelephone() {
+        return telephone;
     }
 
-    public void setHoraires(String horaires) {
-        this.horaires = horaires;
+    public void setTelephone(int telephone) {
+        this.telephone = telephone;
     }
 
-    public String getLogo() {
-        return logo;
+    public String getLogoUrl() {
+        return logoUrl;
     }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
     }
 
     public String getStatut() {
@@ -78,6 +111,31 @@ public class Restaurant extends User {
     public void setStatut(String statut) {
         this.statut = statut;
     }
+
+    public LocalDateTime getDateInscription() {
+        return date_inscription;
+    }
+
+    public void setDateInscription(LocalDateTime date_inscription) {
+        this.date_inscription = date_inscription;
+    }
+
+    public String getHoraires() {
+        return horaires;
+    }
+
+    public void setHoraires(String horaires) {
+        this.horaires = horaires;
+    }
+
+    @Override
+    public String toString() {
+        return "Restaurant [id_restaurant=" + idRestaurant + ", nom=" + nom + ", description=" + description
+                + ", adresse=" + adresse + ", telephone=" + telephone + ", logoUrl=" + logoUrl + ", statut=" + statut
+                + ", date_inscription=" + date_inscription + ", horaires=" + horaires + "]";
+    } 
+
+
 
     // Getter et Setter pour la liste des plats
     public List<Plat> getPlats() {

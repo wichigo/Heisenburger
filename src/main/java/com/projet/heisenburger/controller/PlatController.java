@@ -81,7 +81,7 @@ public class PlatController {
 
     // GET /restaurant/plats/edit/{id} : Afficher le formulaire pour modifier un plat existant
     @GetMapping("/edit/{id}")
-    public String showEditPlatForm(@PathVariable("id") Long id, // @PathVariable récupère l'ID du plat depuis l'URL
+    public String showEditPlatForm(@PathVariable("id") int id, // @PathVariable récupère l'ID du plat depuis l'URL
                                    HttpSession session,
                                    Model model,
                                    RedirectAttributes redirectAttributes) {
@@ -94,7 +94,7 @@ public class PlatController {
         if (platOptional.isPresent()) {
             Plat plat = platOptional.get();
             // Vérifier que le plat appartient bien au restaurant connecté [cite: 69]
-            if (!plat.getRestaurant().getId().equals(restaurant.getId())) {
+            if (plat.getRestaurant().getId() != (restaurant.getId())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Accès non autorisé à ce plat.");
                 return "redirect:/restaurant/plats"; // Redirige si le plat n'appartient pas au restaurant
             }
@@ -109,7 +109,7 @@ public class PlatController {
 
     // GET /restaurant/plats/delete/{id} : Supprimer un plat
     @GetMapping("/delete/{id}")
-    public String deletePlat(@PathVariable("id") Long id,
+    public String deletePlat(@PathVariable("id") int id,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         Restaurant restaurant = getAuthenticatedRestaurant(session);
@@ -121,7 +121,7 @@ public class PlatController {
         if (platOptional.isPresent()) {
             Plat plat = platOptional.get();
             // Vérifier que le plat appartient bien au restaurant connecté avant de supprimer [cite: 71]
-            if (plat.getRestaurant().getId().equals(restaurant.getId())) {
+            if (plat.getRestaurant().getId() == (restaurant.getId())) {
                 platRepository.delete(plat); // Supprime le plat [cite: 71]
                 redirectAttributes.addFlashAttribute("successMessage", "Plat '" + plat.getNom() + "' supprimé avec succès !");
             } else {
