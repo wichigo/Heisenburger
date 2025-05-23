@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle ?: 'Modifier Logo'}">Modifier Logo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+     <style>
+        body { background-color: #f8f9fa; padding-top: 20px; }
+        .container { max-width: 700px; }
+        .logo-preview { max-width: 200px; max-height: 200px; margin-top: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top bg-light border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/admin/dashboard}">Heisenburger Admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+             <div class="navbar-nav me-auto">
+                <a class="nav-link" th:href="@{/admin_gestion_restaurant}">Restaurants</a>
+                <a class="nav-link" th:href="@{/admin_gestion_client}">Clients</a>
+                <a class="nav-link" th:href="@{/admin_gestion_commande}">Commandes</a>
+                <a class="nav-link" href="#">Statistiques</a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                 <span class="navbar-text me-3" th:if="${session.user != null}"
+                      th:text="'Bienvenue Admin ' + ${session.user.nom} + ' ' + ${session.user.prenom}"></span>
+                <a class="nav-link" href="#">Profil</a>
+                <a th:href="@{/logout}" class="btn btn-danger">Déconnexion</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5 pt-5">
+    <h2 th:text="${pageTitle ?: 'Modifier le Logo du Restaurant'}">Modifier le Logo</h2>
+
+    <form th:action="@{/admin/restaurant/logo/save}" th:object="${restaurant}" method="post" class="mt-4">
+        <input type="hidden" th:field="*{id}" /> <input type="hidden" th:field="*{idRestaurant}" /> <div class="mb-3">
+            <label for="nom" class="form-label">Restaurant:</label>
+            <input type="text" class="form-control" id="nom" th:value="*{nom}" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label for="logoUrl" class="form-label">URL du Logo:</label>
+            <input type="url" class="form-control" id="logoUrl" th:field="*{logoUrl}" placeholder="https://example.com/logo.png" />
+        </div>
+
+        <div th:if="*{logoUrl != null && !logoUrl.trim().isEmpty()}">
+            <p>Aperçu actuel:</p>
+            <img th:src="*{logoUrl}" alt="Logo actuel" class="logo-preview img-thumbnail" />
+        </div>
+         <div th:if="*{logoUrl == null || logoUrl.trim().isEmpty()}">
+            <p>Aucun logo défini actuellement.</p>
+        </div>
+        
+        <hr>
+        <button type="submit" class="btn btn-primary">Enregistrer URL du Logo</button>
+        <a th:href="@{/admin_gestion_restaurant(idRestaurant=${restaurant.idRestaurant})}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

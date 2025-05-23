@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 public class Commande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_commande;
+    private int id_commande;
 
     private LocalDateTime date_commande;
     private String statut;
@@ -37,11 +37,11 @@ public class Commande {
     public Commande() {
     }
 
-    public Long getIdCommande() {
+    public int getIdCommande() {
         return id_commande;
     }
 
-    public void setIdCommande(Long id_commande) {
+    public void setIdCommande(int id_commande) {
         this.id_commande = id_commande;
     }
 

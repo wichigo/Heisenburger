@@ -17,7 +17,7 @@ public class Admin extends User {
     // Constructeurs, getters et setters
     public Admin() {
         super();
-
+        
     }
 
     public Admin(String email, String password, String role_admin, String nom, String prenom) {
@@ -26,7 +26,7 @@ public class Admin extends User {
         this.nom = nom;
         this.prenom = prenom;
     }
-
+    
     public String getRoleAdmin() {
         return role_admin;
     }
@@ -54,6 +54,6 @@ public class Admin extends User {
     @Override
     public String toString() {
         return "Admin [role=" + role_admin + ", nom=" + nom + ", prenom=" + prenom + "]";
-    }
-
+    }  
+   
 }

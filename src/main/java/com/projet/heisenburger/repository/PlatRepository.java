@@ -5,11 +5,11 @@ import com.projet.heisenburger.model.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
-public interface PlatRepository extends JpaRepository<Plat, Long> {
+public interface PlatRepository extends JpaRepository<Plat, Integer> {
 
     // Méthode pour trouver tous les plats appartenant à un restaurant spécifique
     List<Plat> findByRestaurant(Restaurant restaurant);
 
-    // Optionnel : Trouver les plats d'un restaurant par son ID
-    // List<Plat> findByRestaurantId(Long restaurantId);
+    List<Plat> findByRestaurantId(Integer restaurantId);
+
 }

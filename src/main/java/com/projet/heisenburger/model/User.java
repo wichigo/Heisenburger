@@ -11,7 +11,7 @@ public abstract class User { // La classe devient abstraite
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_login")
-    protected Long id; // Passage en protected pour l'accès par les sous-classes
+    protected int id; // Passage en protected pour l'accès par les sous-classes
 
     protected String email; // Passage en protected
     protected String password; // Passage en protected
@@ -27,7 +27,7 @@ public abstract class User { // La classe devient abstraite
     }
 
     // Getters
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
@@ -40,7 +40,7 @@ public abstract class User { // La classe devient abstraite
     }
 
     // Setters
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

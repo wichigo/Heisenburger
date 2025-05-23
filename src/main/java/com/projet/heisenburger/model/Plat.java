@@ -8,7 +8,7 @@ public class Plat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_produiot;
+    private int id_produit;
 
     private String nom;
     private String description;
@@ -24,15 +24,17 @@ public class Plat {
     @JoinColumn(name = "id_categorie")
     private Categorie categorie;
 
+    
+
     public Plat() {
     }
 
-    public Long getId_produiot() {
-        return id_produiot;
+    public int getId_produiot() {
+        return id_produit;
     }
 
-    public void setId_produiot(Long id_produiot) {
-        this.id_produiot = id_produiot;
+    public void setId_produiot(int id_produit) {
+        this.id_produit = id_produit;
     }
 
     public String getNom() {
@@ -94,14 +96,14 @@ public class Plat {
     @Override
     public String toString() {
         return "Plat{" +
-                "id_produiot=" + id_produiot +
-                ", nom='" + nom + "" +
-                ", description='" + description + "" +
+                "id_produiot=" + id_produit +
+                ", nom='" + nom + '\'' +
+                ", description='" + description + '\'' +
                 ", prix=" + prix +
                 ", image_url=" + image_url +
-                ", disponible='" + disponible + "" +
+                ", disponible='" + disponible + '\'' +
                 ", restaurant=" + restaurant +
                 ", categorie=" + categorie +
                 '}';
     }
-}
+}       

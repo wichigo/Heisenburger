@@ -17,7 +17,8 @@ import java.util.List;
 
 public class Restaurant extends User {
 
-    private Long id_restaurant;
+    @Column(name = "id_restaurant", insertable=false, updatable=false)
+    private int idRestaurant;
     private String nom;
     private String description;
     private String adresse;
@@ -30,17 +31,18 @@ public class Restaurant extends User {
 
 
 
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER) // fetch = FetchType.EAGER peut simplifier pour l'instant, sinon LAZY et gérer la session/transaction
+    private List<Plat> plats = new ArrayList<>(); // Décommenté et initialisé
+
     // mappedBy="restaurant" indique que l'entité Plat gère la relation (via son champ 'restaurant')
     // CascadeType.ALL: les opérations (persist, merge, remove, refresh, detach) sur Restaurant sont propagées à Plats.
     // orphanRemoval=true: si un Plat est retiré de la liste 'plats' du Restaurant, il sera supprimé de la BDD.
-    // @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Plat> plats = new ArrayList<>(); // Initialisation de la liste
 
     public Restaurant() {
         super();
     }
 
-    public Restaurant(String email, String password, Long id_restaurant, String nom, String description, String adresse, int telephone, String logoUrl, String statut, LocalDateTime date_inscription, String horaires) {
+    public Restaurant(String email, String password, String nom, String description, String adresse, int telephone, String logoUrl, String statut, LocalDateTime date_inscription, String horaires) {
         super(email, password);
         this.id_restaurant = id_restaurant;
         this.nom = nom;
@@ -53,12 +55,12 @@ public class Restaurant extends User {
         this.horaires = horaires;
     }
 
-    public Long getIdRestaurant() {
-        return id_restaurant;
+    public int getIdRestaurant() {
+        return idRestaurant;
     }
 
-    public void setIdRestaurant(Long id_restaurant) {
-        this.id_restaurant = id_restaurant;
+    public void setIdRestaurant(int idRestaurant) {
+        this.idRestaurant = idRestaurant;
     }
 
     public String getNom() {
@@ -127,17 +129,17 @@ public class Restaurant extends User {
 
     @Override
     public String toString() {
-        return "Restaurant [id_restaurant=" + id_restaurant + ", nom=" + nom + ", description=" + description
+        return "Restaurant [id_restaurant=" + idRestaurant + ", nom=" + nom + ", description=" + description
                 + ", adresse=" + adresse + ", telephone=" + telephone + ", logoUrl=" + logoUrl + ", statut=" + statut
                 + ", date_inscription=" + date_inscription + ", horaires=" + horaires + "]";
     } 
 
 
 
-    // // Getter et Setter pour la liste des plats
-    // public List<Plat> getPlats() {
-    //     return plats;
-    // }
+    // Getter et Setter pour la liste des plats
+    public List<Plat> getPlats() {
+        return plats;
+    }
 
     // public void setPlats(List<Plat> plats) {
     //     this.plats = plats;
