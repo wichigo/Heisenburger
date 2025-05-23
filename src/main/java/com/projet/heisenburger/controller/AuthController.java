@@ -50,53 +50,40 @@ public class AuthController {
         return "login";
     }
 
-    // GET mapping for client registration form
     @GetMapping("/client_inscription")
-    public String clientRegisterForm(Model model) { // Renommé pour clarté et ajout de Model
-        model.addAttribute("client", new Client()); // Fournir un objet Client vide pour le form binding
+    public String clientRegisterForm(Model model) { 
+        model.addAttribute("client", new Client()); 
         return "/client/client_inscription";
     }
 
-    // POST mapping to handle client registration
     @PostMapping("/client/register")
     public String registerClient(@ModelAttribute("client") Client client,
                                  @RequestParam("confirmPassword") String confirmPassword,
                                  Model model,
                                  RedirectAttributes redirectAttributes) {
 
-        // 1. Validate passwords
         if (client.getPassword() == null || client.getPassword().isEmpty() || !client.getPassword().equals(confirmPassword)) {
             model.addAttribute("error", "Les mots de passe ne correspondent pas ou sont vides.");
-            // model.addAttribute("client", client); // Renvoyer le client avec les données saisies
             return "/client/client_inscription";
         }
 
-        // 2. Check if email already exists
         Optional<User> existingUser = userRepository.findByEmail(client.getEmail());
         if (existingUser.isPresent()) {
             model.addAttribute("error", "Un compte existe déjà avec cet email.");
-            // model.addAttribute("client", client);
             return "/client/client_inscription";
         }
 
-        // 3. Set default values for the new client
         client.setStatut("actif"); // Les clients sont actifs par défaut à l'inscription
         client.setDateInscription(LocalDateTime.now());
-        // Le rôle "CLIENT" est géré par @DiscriminatorValue sur l'entité Client
 
         try {
-            // 4. Save the client
-            // Ceci enregistrera dans 'login' (partie User) et 'client' (partie Client)
-            // id_login (User.id) sera généré et défini.
-            // id_client sera également défini (et sera égal à id_login grâce à @PrimaryKeyJoinColumn)
-            User savedClient = userRepository.save(client); // Save using UserRepository
+            User savedClient = userRepository.save(client);
 
             redirectAttributes.addFlashAttribute("successMessage", "Inscription réussie " +
                     ((Client) savedClient).getPrenom() + "! Vous pouvez maintenant vous connecter.");
             return "redirect:/login"; // Rediriger vers la page de connexion après une inscription réussie
 
         } catch (Exception e) {
-            // Logger l'exception : e.printStackTrace(); ou utiliser un logger
             model.addAttribute("error", "Une erreur est survenue lors de l'inscription: " + e.getMessage());
             // model.addAttribute("client", client);
             return "/client/client_inscription";
@@ -104,14 +91,12 @@ public class AuthController {
     }
 
 
-    // GET mapping for restaurant registration form
     @GetMapping("/restaurant_inscription")
     public String proRegisterForm(Model model) {
         model.addAttribute("restaurant", new Restaurant());
         return "/restaurant/restaurant_inscription";
     }
 
-    // POST mapping to handle restaurant registration (précédemment ajouté)
     @PostMapping("/restaurant/register")
     public String registerRestaurant(@ModelAttribute("restaurant") Restaurant restaurant,
                                      @RequestParam("confirmPassword") String confirmPassword,

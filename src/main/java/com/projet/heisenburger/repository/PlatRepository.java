@@ -10,6 +10,6 @@ public interface PlatRepository extends JpaRepository<Plat, Integer> {
     // Méthode pour trouver tous les plats appartenant à un restaurant spécifique
     List<Plat> findByRestaurant(Restaurant restaurant);
 
-    // Optionnel : Trouver les plats d'un restaurant par son ID
-    // List<Plat> findByRestaurantId(Long restaurantId);
+    List<Plat> findByRestaurantId(Integer restaurantId);
+
 }

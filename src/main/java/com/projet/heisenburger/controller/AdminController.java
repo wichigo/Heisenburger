@@ -76,7 +76,6 @@ public class AdminController {
                                          HttpSession session, RedirectAttributes redirectAttributes) {
         Admin admin = getAuthenticatedAdmin(session);
         if (admin == null) {
-            // Optionally add a flash attribute for unauthorized access if you want to show a message on login page
             return "redirect:/login";
         }
 
@@ -232,11 +231,8 @@ public class AdminController {
             commandes = commandeRepository.findAll();
         }
         
-        // If idClientParam is provided, further filter by client ID (if needed, not fully implemented here for brevity)
-        // For now, just passing all (or status-filtered) commandes
         model.addAttribute("commandes", commandes);
         model.addAttribute("currentStatutCommande", statutCommandeParam);
-        // model.addAttribute("currentIdClient", idClientParam); // If you implement client filtering
 
         return "admin/admin_gestion_client";
     }
@@ -249,7 +245,6 @@ public class AdminController {
             return "redirect:/login";
         }
         model.addAttribute("user", admin);
-        // Add logic to fetch and display commandes if necessary
         return "admin/admin_gestion_commande";
     }
 

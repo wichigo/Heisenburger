@@ -37,8 +37,6 @@ public class Restaurant extends User {
     // mappedBy="restaurant" indique que l'entité Plat gère la relation (via son champ 'restaurant')
     // CascadeType.ALL: les opérations (persist, merge, remove, refresh, detach) sur Restaurant sont propagées à Plats.
     // orphanRemoval=true: si un Plat est retiré de la liste 'plats' du Restaurant, il sera supprimé de la BDD.
-    // @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Plat> plats = new ArrayList<>(); // Initialisation de la liste
 
     public Restaurant() {
         super();
