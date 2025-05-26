@@ -6,22 +6,65 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            width : 100vw;
+            margin: 0;
+            background: linear-gradient(to bottom right, #e70b03, #e6870b) fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; 
+            font-family: sans-serif;
         }
         .container {
-            max-width: 600px;
-            margin-top: 50px;
+            max-width: 50%;
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
+            position : absolute;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            right : 5%;
+            width: 40%;
+            margin-bottom: 2%;
+            
         }
+
         .form-label {
-            font-weight: 500;
+            font-weight: 300;
+        }
+
+        .login-image {
+            border-radius: 20px;
+            position: fixed;
+            left: 15%;
+            flex: 1;
+            bottom: 8%;
+        }
+
+        .container-1 {
+            display : flex;
+        }
+
+        .lol {
+            flex : 1;
+        }
+
+        .cece {
+            flex : 1;
+            margin-right: 10%;
+        }
+
+
+        .logo{
+            width: 9%;
+            position : absolute;
+            top: 4%;
+            left: 2%;
         }
     </style>
 </head>
 <body>
+    <img src="/images/Heisenberg.svg" alt="heisenberg" class="logo">
+    <img src="/images/heisenbergslipweb.jpg" alt="heisenberg" class="login-image">
     <div class="container">
         <h2 class="text-center mb-4">Inscription Professionnelle</h2>
         <p class="text-center text-muted mb-4">Rejoignez Heisenburger et proposez vos plats à nos clients.</p>
@@ -33,64 +76,68 @@
             Success placeholder
         </div>
 
-        <form th:action="@{/restaurant/register}" th:object="${restaurant}" method="post">
-            <fieldset>
-                <legend class="h5 mb-3">Informations de Connexion</legend>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Adresse Email<span class="text-danger">*</span></label>
-                    <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="votreadresse@example.com" required>
+        <form class="container-1" th:action="@{/restaurant/register}" th:object="${restaurant}" method="post">
+            <div class="cece">
+                <fieldset>
+                    <legend class="h5 mb-3">Informations de Connexion</legend>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Adresse Email<span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="votreadresse@example.com" required>
+                        </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">  <br>
+                            <label for="password" class="form-label">Mot de passe<span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="********" required>
+                        </div> 
+                        <div class="col-md-6 mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmer le mot de passe<span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="********" required>
+                        </div>
                     </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="password" class="form-label">Mot de passe<span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="********" required>
+                </fieldset>
+            
+                <fieldset class="mt-4">
+                    <legend class="h5 mb-3">Détails du Restaurant</legend>
+                    <div class="mb-3">
+                        <label for="nom" class="form-label">Nom du Restaurant<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nom" th:field="*{nom}" placeholder="Le Nom de Votre Restaurant" required>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="confirmPassword" class="form-label">Confirmer le mot de passe<span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="********" required>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" th:field="*{description}" rows="3" placeholder="Décrivez brièvement votre restaurant..."></textarea>
+                    </div> 
+                </div> 
+                <div class="lol">
+                    <div class="mb-3">
+                        <label for="adresse" class="form-label">Adresse Complète<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="adresse" th:field="*{adresse}" placeholder="123 Rue Principale, Ville, Code Postal" required>
                     </div>
-                </div>
-            </fieldset>
+                    <div class="mb-3">
+                        <label for="telephone" class="form-label">Numéro de Téléphone<span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" id="telephone" th:field="*{telephone}" placeholder="0123456789" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="horaires" class="form-label">Horaires d'ouverture</label>
+                        <input type="text" class="form-control" id="horaires" th:field="*{horaires}" placeholder="Ex: Lun-Ven: 9h-22h, Sam: 10h-23h">
+                    </div>
+                    <div class="mb-3">
+                        <label for="logoUrl" class="form-label">URL du Logo (Optionnel)</label>
+                        <input type="url" class="form-control" id="logoUrl" th:field="*{logoUrl}" placeholder="https://example.com/votre_logo.png">
+                    </div>
+                </fieldset>
 
-            <fieldset class="mt-4">
-                <legend class="h5 mb-3">Détails du Restaurant</legend>
-                <div class="mb-3">
-                    <label for="nom" class="form-label">Nom du Restaurant<span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="nom" th:field="*{nom}" placeholder="Le Nom de Votre Restaurant" required>
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
                 </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" th:field="*{description}" rows="3" placeholder="Décrivez brièvement votre restaurant..."></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="adresse" class="form-label">Adresse Complète<span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="adresse" th:field="*{adresse}" placeholder="123 Rue Principale, Ville, Code Postal" required>
-                </div>
-                <div class="mb-3">
-                    <label for="telephone" class="form-label">Numéro de Téléphone<span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" id="telephone" th:field="*{telephone}" placeholder="0123456789" required>
-                </div>
-                 <div class="mb-3">
-                    <label for="horaires" class="form-label">Horaires d'ouverture</label>
-                    <input type="text" class="form-control" id="horaires" th:field="*{horaires}" placeholder="Ex: Lun-Ven: 9h-22h, Sam: 10h-23h">
-                </div>
-                <div class="mb-3">
-                    <label for="logoUrl" class="form-label">URL du Logo (Optionnel)</label>
-                    <input type="url" class="form-control" id="logoUrl" th:field="*{logoUrl}" placeholder="https://example.com/votre_logo.png">
-                </div>
-            </fieldset>
-
-            <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
-            </div>
         </form>
 
-        <p class="text-center mt-4">
-            Déjà un compte ? <a th:href="@{/login}">Connectez-vous ici</a>
-        </p>
-        <p class="text-center mt-2">
-             <a th:href="@{/}">Retour à l'accueil</a>
-        </p>
+            <p class="text-center mt-5">
+                Déjà un compte ? <a th:href="@{/login}">Connectez-vous ici</a>
+            </p>
+            <p class="text-center mt-2">
+                <a th:href="@{/}">Retour à l'accueil</a>
+            </p>
+         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

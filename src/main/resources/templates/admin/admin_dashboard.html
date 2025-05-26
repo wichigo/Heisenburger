@@ -8,7 +8,8 @@
     <style>
         /* Optionnel: pour un peu plus d'espacement ou de style personnalisé */
         body {
-            background-color: #f8f9fa; /* Fond légèrement gris pour la page entière */
+            background: linear-gradient(to bottom right, #e70b03, #e6870b);
+           
         }
         .navbar-nav .nav-link {
             margin-right: 10px; /* Espace entre les éléments */
@@ -19,7 +20,7 @@
             margin-right: 15px;
         }
         .navbar {
-            background-color: #f8f9fa !important; /* Couleur de fond gris clair comme dans l'image */
+            background-color: #e6870b !important; /* Couleur de fond gris clair comme dans l'image */
             border-bottom: 1px solid #dee2e6; /* Petite bordure en bas */
         }
         /* Style pour les boutons gris comme dans l'image */
@@ -67,17 +68,17 @@
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
-            <img src="path/to/your/logo.png" alt="Logo Heisenburger">
+           <img src="/images/Heisenberg.svg" alt="heisenberg" class="logo">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav me-auto">
-                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_restaurant}" >restaurants</a>
-                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_client}" >clients</a>
-                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_commande}" >commandes</a>
-                <a class="nav-link btn-custom-gray" href="#">statistiques</a>
+                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_restaurant}" >Restaurants</a>
+                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_client}" >Clients</a>
+                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_commande}" >Commandes</a>
+                <a class="nav-link btn-custom-gray" href="#">Statistiques</a>
             </div>
             <p th:if="${user != null}">
                 Bienvenue Admin <strong th:text="${user.nom} + ' ' + ${user.prenom}"></strong> !

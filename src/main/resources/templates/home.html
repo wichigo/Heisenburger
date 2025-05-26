@@ -1,22 +1,47 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<style>
+     body {
+            margin: 0;
+            background: linear-gradient(to bottom right, #e70b03, #e6870b);
+            /* display: flex; */
+           /*  justify-content: center;
+            align-items: center; */
+            min-height: 100vh;
+            font-family: sans-serif;
+        }
+
+        .logo{
+            width: 9%;
+            position : absolute;
+            top: 4%;
+            left: 2%;
+        }
+
+
+</style>
+
+
+
+
 <head>
     <meta charset="UTF-8">
     <title>Accueil Heisenburger</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
+    <img src="/images/Heisenberg.svg" alt="heisenberg" class="logo">
     <div class="container mt-5">
         <h2>Bienvenue sur Heisenburger</h2>
         <p><a href="/login" th:href="@{/login}" class="btn btn-primary">Connexion</a></p>
     </div>
     <div class="container mt-5">
-        <h2>Bienvenue sur SpeedResto</h2>
-        <p><a href="/client/client_inscription" th:href="@{/client_inscription}" class="btn btn-primary">inscription</a></p>
+        <h2>Inscrivez vous rapidement</h2>
+        <p><a href="/client/client_inscription" th:href="@{/client_inscription}" class="btn btn-primary">Inscription</a></p>
     </div>
     <div class="container mt-5">
         <h2>Vous êtes un restaurant ? </h2>
-        <p><a href="/restaurant/restaurant_inscription" th:href="@{/restaurant_inscription}" class="btn btn-primary">inscription</a></p>
+        <p><a href="/restaurant/restaurant_inscription" th:href="@{/restaurant_inscription}" class="btn btn-primary">Inscription</a></p>
     </div>
 </body>
 </html>
