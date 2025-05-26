@@ -183,10 +183,10 @@ public class AdminController {
         if (restaurantOpt.isPresent()) {
             model.addAttribute("restaurant", restaurantOpt.get());
             model.addAttribute("pageTitle", "Modifier le Logo: " + restaurantOpt.get().getNom());
-            return "admin/admin_restaurant_logo_form";
+            return "admin/admin_restaurant_logo";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Restaurant non trouvé.");
-            return "redirect:/admin_gestion_restaurant";
+            return "redirect:/admin_restaurant_logo";
         }
     }
 
@@ -288,15 +288,15 @@ public class AdminController {
         } else {
             restaurantsFromDB = restaurantRepository.findAll();
         }
-        
         List<Restaurant> filteredRestaurants;
         if (statutRestaurantParam != null && !statutRestaurantParam.isEmpty()) {
             final String statutToCompareResto = statutRestaurantParam.toUpperCase();
             filteredRestaurants = restaurantsFromDB.stream()
                     .filter(r -> r.getStatut() != null && statutToCompareResto.equals(r.getStatut().toUpperCase()))
                     .collect(Collectors.toList());
+
         } else {
-             filteredRestaurants = restaurantsFromDB; // Or an empty list
+            filteredRestaurants = restaurantsFromDB; 
         }
         model.addAttribute("restaurants", filteredRestaurants);
         model.addAttribute("currentCodePostal", codePostal);

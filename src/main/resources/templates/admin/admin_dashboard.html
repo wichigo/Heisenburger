@@ -3,217 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navbar Heisenburger</title>
+    <title>Admin Dashboard - Heisenburger</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        /* Optionnel: pour un peu plus d'espacement ou de style personnalisé */
-        body {
-            background: linear-gradient(to bottom right, #e70b03, #e6870b);
-           
+        :root {
+            --primary-gradient: linear-gradient(to bottom right, #e70b03, #e6870b);
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            --card-border: 1px solid rgba(255, 255, 255, 0.18);
+            --text-light: #f1f1f1;
         }
-        .navbar-nav .nav-link {
-            margin-right: 10px; /* Espace entre les éléments */
-            color: #333; /* Couleur de texte un peu plus foncée pour contraster avec le fond clair par défaut de la navbar */
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--primary-gradient);
+            color: var(--text-light);
+            padding-top: 80px; /* Space for fixed navbar */
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: var(--card-border);
+            box-shadow: var(--card-shadow);
         }
         .navbar-brand img {
-            max-height: 40px; /* Ajustez la hauteur du logo si besoin */
-            margin-right: 15px;
+            max-height: 40px;
         }
-        .navbar {
-            background-color: #e6870b !important; /* Couleur de fond gris clair comme dans l'image */
-            border-bottom: 1px solid #dee2e6; /* Petite bordure en bas */
+        .navbar .nav-link, .navbar .navbar-text, .navbar .btn-danger {
+            color: var(--text-light);
         }
-        /* Style pour les boutons gris comme dans l'image */
-        .nav-link.btn-custom-gray {
-            background-color: #d3d3d3; /* Gris clair */
-            color: #333; /* Texte foncé pour le contraste */
-            border-radius: 0.25rem; /* Bords légèrement arrondis */
-            padding: 0.375rem 0.75rem; /* Padding standard des boutons Bootstrap */
-            margin-left: 5px; /* Petit espacement à gauche de chaque bouton */
-            margin-right: 5px; /* Petit espacement à droite de chaque bouton */
-        }
-        .nav-link.btn-custom-gray:hover {
-            background-color: #bfbfbf; /* Gris un peu plus foncé au survol */
-            color: #333;
-        }
-        .content-block {
-            background-color: #e9ecef; /* Fond gris plus prononcé pour les blocs */
-            padding: 20px;
-            border-radius: 0.25rem;
-            min-height: 150px; /* Hauteur minimale pour la visibilité */
+
+        .page-layout {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #495057;
+            justify-content: space-evenly;
+            align-items: stretch; 
+            gap: 30px;
+            width: 100%;
+            max-width: 90%;
+            padding: 20px 0;
         }
-        .filter-bar {
-            background-color: #e9ecef;
-            padding: 10px;
-            border-radius: 0.25rem;
+
+        /* Card Styles */
+        .dashboard-column-container {
+            flex: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            background-color: rgb(255, 255, 255);
+            border-radius: 20px;            
+            padding: 30px 40px;
+            max-width: 800px;
+            height: 60vh;
+            color : black
         }
-        .main-content-area {
-            min-height: 400px; /* Hauteur plus importante pour le graphe et la liste */
+        .dashboard-column-container h3 {
+            border-bottom: 1px solid #e70b03;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-        .sidebar-content-area {
-             min-height: 400px; /* Hauteur alignée sur le graphe */
+
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            body { padding-top: 70px; }
+            .page-layout {
+                flex-direction: column;
+                align-items: center;
+                max-width: 95%;
+            }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg fixed-top navbar-collapse">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-           <img src="/images/Heisenberg.svg" alt="heisenberg" class="logo">
+        <a class="navbar-brand" th:href="@{/admin/dashboard}">
+           <img src="/images/Heisenberg.svg" alt="Heisenburger Logo">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="collapse navbar-collapse">
             <div class="navbar-nav me-auto">
-                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_restaurant}" >Restaurants</a>
-                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_client}" >Clients</a>
-                <a class="nav-link btn-custom-gray" href="#" th:href="@{/admin_gestion_commande}" >Commandes</a>
-                <a class="nav-link btn-custom-gray" href="#">Statistiques</a>
+                <a class="nav-link" th:href="@{/admin_gestion_restaurant}">Restaurants</a>
+                <a class="nav-link" th:href="@{/admin_gestion_client}">Clients</a>
+                <a class="nav-link" th:href="@{/admin_gestion_commande}">Commandes</a>
             </div>
-            <p th:if="${user != null}">
-                Bienvenue Admin <strong th:text="${user.nom} + ' ' + ${user.prenom}"></strong> !
-            </p>
-            <div class="navbar-nav ms-auto">
-                 <a class="nav-link btn-custom-gray" href="#">profil</a>
-                <a href="/logout" th:href="@{/logout}" class="btn btn-danger">Déconnexion</a>
+            <div class="navbar-nav ms-auto d-flex align-items-center">
+                <span class="navbar-text me-3" th:if="${user != null}" th:text="'Admin: ' + ${user.prenom}"></span>
+                <a class="nav-link" th:href="@{/admin_profil}"><i class="bi bi-person-circle"></i> Profil</a>
+                <a th:href="@{/logout}" class="btn btn-outline-light ms-2"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
             </div>
         </div>
     </div>
 </nav>
-<div class="container-fluid mt-3">
-    <div class="row mb-3">
-        <div class="col-md-10">
-            <input type="text" class="form-control" placeholder="recherche">
-        </div>
-        <div class="col-md-2">
-            <button class="btn btn-secondary w-100 filter-bar">filtres</button>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="container mt-4">
-    <h3>Liste des Commandes</h3>
-    <form th:action="@{/admin/dashboard}" method="get" class="row g-3 mb-3 align-items-center">
-        <div class="col-auto">
-        <label for="statutCommandeSearch" class="visually-hidden">Statut</label>
-        <select class="form-select" id="statutCommandeSearch" name="statutCommande">
-            <option value="" th:selected="${currentStatutCommande == null || currentStatutCommande.isEmpty()}">Tous statuts</option>
-            <option value="nouvelle" th:selected="${currentStatutCommande == 'nouvelle'}">nouvelles</option>
-            <option value="en_preparation" th:selected="${currentStatutCommande == 'en_preparation'}">en preparation</option>
-            <option value="prete" th:selected="${currentStatutCommande == 'prete'}">prêtes</option>
-            <option value="en_livraison" th:selected="${currentStatutCommande == 'en_livraison'}">en livraison</option>
-            <option value="livree" th:selected="${currentStatutCommande == 'livree'}">livrées</option>
-        </select>
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Rechercher</button>
-        </div> 
-    </form>
+<main class="page-layout">
 
-    <div th:if="${commandes != null && !commandes.isEmpty()}">
-        <table class="table table-striped table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th>ID Commande</th>
-                    <th>ID Client</th>
-                    <th>ID Restaurant</th>
-                    <th>Date</th>
-                    <th>Statut</th>
-                    <th>Montant Total</th>
-                    <th>Adresse Livraison</th>
-                    </tr>
-            </thead>
-            <tbody>
-                <tr th:each="commande : ${commandes}">
-                    <td th:text="${commande.idCommande}"></td>
-                    <td>
-                        <a th:if="${commande.client != null}"
-                           class="nav-link btn-custom-gray"
-                           th:href="@{/admin_gestion_client(clientId=${commande.client.id})}"
-                           th:text="${commande.client.id}">
-                        </a>
-                        <span th:if="${commande.client == null}">N/A</span>
-                    </td>
-                    <td th:text="${commande.restaurant != null ? commande.restaurant.idRestaurant : 'N/A'}"></td>
-                    <td th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></td>
-                    <td th:text="${commande.statut}"></td>
-                    <td th:text="${#numbers.formatDecimal(commande.montantTotal, 1, 'COMMA', 2, 'POINT')} + ' €'"></td>
-                    <td th:text="${commande.adresseLivraison}"></td>
-                    </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="container mt-4">
-        <h3>Gestion des Restaurants</h3>
-
-        <form th:action="@{/admin/dashboard}" method="get" class="row g-3 mb-3 align-items-center">
-            <div class="col-auto">
-                <label for="codePostalSearch" class="visually-hidden">Code Postal</label>
-                <input type="text" class="form-control" id="codePostalSearch" name="codePostal"
-                    placeholder="Filtrer par Code Postal" th:value="${currentCodePostal}">
+    <div class="dashboard-column-container">
+        <h3><i class="bi bi-receipt"></i> Commandes en Cours</h3>
+        <form th:action="@{/admin/dashboard}" method="get" class="row g-3 mb-4 align-items-end">
+            <div class="col">
+                <label for="statutCommandeSearch" class="form-label">Statut</label>
+                <select class="form-select" id="statutCommandeSearch" name="statutCommande">
+                    <option value="">Tous</option>
+                    <option value="nouvelle" th:selected="${currentStatutCommande == 'nouvelle'}">Nouvelles</option>
+                    <option value="en_preparation" th:selected="${currentStatutCommande == 'en_preparation'}">En préparation</option>
+                    <option value="prete" th:selected="${currentStatutCommande == 'prete'}">Prêtes</option>
+                    <option value="en_livraison" th:selected="${currentStatutCommande == 'en_livraison'}">En livraison</option>
+                    <option value="livree" th:selected="${currentStatutCommande == 'livree'}">Livrées</option>
+                </select>
             </div>
             <div class="col-auto">
-                <label for="statutRestaurantSearch" class="visually-hidden">Statut</label>
-                <select class="form-select" id="statutRestaurantSearch" name="statutRestaurant">
-                    <option value="" th:selected="${currentStatutRestaurant == null || currentStatutRestaurant.isEmpty()}">Tous statuts</option>
-                    <option value="actif" th:selected="${currentStatutRestaurant == 'actif'}">actif</option>
-                    <option value="inactif" th:selected="${currentStatutRestaurant == 'inactif'}">inactif</option>
-                    </select>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Rechercher</button>
+                <button type="submit" class="btn btn-light"><i class="bi bi-funnel"></i> Filtrer</button>
             </div>
         </form>
+        <div class="table-responsive">
+            <div th:if="${!#lists.isEmpty(commandes)}">
+                <table class="table table-hover">
+                    <thead><tr><th>ID</th><th>Client</th><th>Restaurant</th><th>Statut</th><th>Montant</th></tr></thead>
+                    <tbody>
+                        <tr th:each="c : ${commandes}">
+                            <td th:text="${c.idCommande}"></td>
+                            <td>
+                                <a th:if="${c.client != null}" th:href="@{/admin_gestion_client(clientId=${c.client.id})}" th:text="${c.client.nom}"></a>
+                                <span th:if="${c.client == null}" class="text-danger">Client introuvable</span>
+                            </td>
+                            <td th:text="${c.restaurant.nom}"></td>
+                            <td th:text="${c.statut}"></td>
+                            <td th:text="${#numbers.formatDecimal(c.montantTotal,1,'COMMA',2,'POINT')} + ' €'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${#lists.isEmpty(commandes)}" class="alert alert-info">Aucune commande trouvée.</div>
+        </div>
+    </div>
 
-        <h4>Restaurants (<span th:text="${currentStatutRestaurant ?: 'Tous'}"></span><span th:if="${currentCodePostal}" th:text="' - CP: ' + ${currentCodePostal}"></span>)</h4>
-        <div th:if="${restaurants != null && !restaurants.isEmpty()}">
-            <table class="table table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID Restaurant</th>
-                        <th>Nom</th>
-                        <th>Adresse</th>
-                        <th>Téléphone</th>
-                        <th>Statut</th>
-                        <th>Horaires</th>
+    <div class="dashboard-column-container">
+        <h3><i class="bi bi-shop"></i> Gestion des Restaurants</h3>
+        <form th:action="@{/admin/dashboard}" method="get" class="row g-3 mb-4 align-items-end">
+            <div class="col">
+                <label for="codePostalSearch" class="form-label">Code Postal</label>
+                <input type="text" class="form-control" id="codePostalSearch" name="codePostal" th:value="${currentCodePostal}">
+            </div>
+            <div class="col">
+                <label for="statutRestaurantSearch" class="form-label">Statut</label>
+                <select class="form-select" id="statutRestaurantSearch" name="statutRestaurant">
+                    <option value="">Tous</option>
+                    <option value="actif" th:selected="${currentStatutRestaurant == 'actif'}">Actif</option>
+                    <option value="inactif" th:selected="${currentStatutRestaurant == 'inactif'}">Inactif</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-light"><i class="bi bi-funnel"></i> Filtrer</button>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <div th:if="${!#lists.isEmpty(restaurants)}">
+                <table class="table table-hover">
+                    <thead><tr><th>ID</th><th>Nom</th><th>Adresse</th><th>Statut</th></tr></thead>
+                    <tbody>
+                        <tr th:each="r : ${restaurants}">
+                            <td th:text="${r.idRestaurant}"></td>
+                            <td><a th:href="@{/admin_gestion_restaurant(idRestaurant=${r.idRestaurant})}" th:text="${r.nom}"></a></td>
+                            <td th:text="${r.adresse}"></td>
+                            <td><span th:text="${r.statut}" th:classappend="${r.statut == 'actif'} ? 'text-success' : 'text-danger'"></span></td>
                         </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="restaurant : ${restaurants}">
-                        <td th:text="${restaurant.idRestaurant}"></td>
-                        <td>
-                            <a class="nav-link btn-custom-gray" href="#" 
-                            th:href="@{/admin_gestion_restaurant} + '?idRestaurant=' + ${restaurant.idRestaurant}" 
-                            th:text="${restaurant.nom}" ></a>
-                        </td>
-                        <td th:text="${restaurant.adresse}"></td>
-                        <td th:text="${restaurant.telephone}"></td>
-                        <td th:text="${restaurant.statut}"></td>
-                        <td th:text="${restaurant.horaires}"></td>
-                        </tr>
-                </tbody>
-            </table>
-        </div>
-        <div th:if="${restaurants == null || restaurants.isEmpty()}">
-            <p>Aucun restaurant ne correspond aux critères actuels.</p>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${#lists.isEmpty(restaurants)}" class="alert alert-info">Aucun restaurant trouvé.</div>
         </div>
     </div>
-    <div th:if="${commandes == null || commandes.isEmpty()}">
-        <p>Aucune commande à afficher pour le moment.</p>
-    </div>
-</div>
-    </div>
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

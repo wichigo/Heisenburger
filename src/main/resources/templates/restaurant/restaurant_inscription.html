@@ -5,140 +5,177 @@
     <title>Inscription Restaurant - Heisenburger</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            width : 100vw;
-            margin: 0;
-            background: linear-gradient(to bottom right, #e70b03, #e6870b) fixed;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; 
-            font-family: sans-serif;
+        :root {
+            --primary-gradient: linear-gradient(to bottom right, #e70b03, #e6870b);
+            --card-shadow-fade: 0 4px 50px rgba(230, 135, 11, 0.3);
+            --text-dark: #333;
+            --primary-color: #e70b03;
+            --border-radius: 20px;
         }
-        .container {
-            max-width: 50%;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            position : absolute;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            right : 5%;
-            width: 40%;
-            margin-bottom: 2%;
-            
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .page-layout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .image-container {
+            flex: 1;
+            display: none;
+        }
+        
+        .image-container img {
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .form-container-card {
+            flex: 1.2;
+            background: #ffffff;
+            color: var(--text-dark);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow-fade);
+            padding: 40px 50px;
+            width: 100%;
+            max-width: 650px;
+        }
+        
+        .form-container-card h2 {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .form-container-card .text-muted {
+            text-align: center;
+            display: block;
+            margin-bottom: 2rem;
         }
 
         .form-label {
-            font-weight: 300;
+            font-weight: 500;
         }
 
-        .login-image {
-            border-radius: 20px;
-            position: fixed;
-            left: 15%;
-            flex: 1;
-            bottom: 8%;
+        fieldset {
+            border: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+        legend {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
         }
 
-        .container-1 {
-            display : flex;
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 12px;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: #c40a03;
+            border-color: #c40a03;
+        }
+        
+        .home-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
         }
 
-        .lol {
-            flex : 1;
-        }
-
-        .cece {
-            flex : 1;
-            margin-right: 10%;
-        }
-
-
-        .logo{
-            width: 9%;
-            position : absolute;
-            top: 4%;
-            left: 2%;
+        @media (min-width: 992px) {
+            .image-container {
+                display: block;
+            }
         }
     </style>
 </head>
 <body>
-    <img src="/images/Heisenberg.svg" alt="heisenberg" class="logo">
-    <img src="/images/heisenbergslipweb.jpg" alt="heisenberg" class="login-image">
-    <div class="container">
-        <h2 class="text-center mb-4">Inscription Professionnelle</h2>
-        <p class="text-center text-muted mb-4">Rejoignez Heisenburger et proposez vos plats à nos clients.</p>
+    
+    <a th:href="@{/}" class="home-link">
+        <img src="/images/Heisenberg.svg" alt="Logo Heisenburger" style="width: 80px;">
+    </a>
 
-        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">
-            Error placeholder
-        </div>
-        <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}">
-            Success placeholder
+    <main class="page-layout">
+        <div class="image-container">
+            <img src="/images/heisenbergslipweb.jpg" alt="Illustration Heisenburger">
         </div>
 
-        <form class="container-1" th:action="@{/restaurant/register}" th:object="${restaurant}" method="post">
-            <div class="cece">
+        <div class="form-container-card">
+            <h2>Inscription Professionnelle</h2>
+            <p class="text-muted">Rejoignez Heisenburger et proposez vos plats à nos clients.</p>
+
+            <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+            <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+
+            <form th:action="@{/restaurant/register}" th:object="${restaurant}" method="post">
                 <fieldset>
-                    <legend class="h5 mb-3">Informations de Connexion</legend>
+                    <legend>Détails du Restaurant</legend>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Adresse Email<span class="text-danger">*</span></label>
-                        <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="votreadresse@example.com" required>
-                        </div>
+                        <label for="nom" class="form-label">Nom du Restaurant <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nom" th:field="*{nom}" required>
+                    </div>
+                     <div class="mb-3">
+                        <label for="adresse" class="form-label">Adresse Complète <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="adresse" th:field="*{adresse}" required>
+                    </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">  <br>
-                            <label for="password" class="form-label">Mot de passe<span class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="********" required>
-                        </div> 
                         <div class="col-md-6 mb-3">
-                            <label for="confirmPassword" class="form-label">Confirmer le mot de passe<span class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="********" required>
+                             <label for="telephone" class="form-label">Téléphone <span class="text-danger">*</span></label>
+                             <input type="tel" class="form-control" id="telephone" th:field="*{telephone}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="horaires" class="form-label">Horaires</label>
+                            <input type="text" class="form-control" id="horaires" th:field="*{horaires}">
                         </div>
                     </div>
                 </fieldset>
-            
-                <fieldset class="mt-4">
-                    <legend class="h5 mb-3">Détails du Restaurant</legend>
+
+                <fieldset>
+                    <legend>Informations de Connexion</legend>
                     <div class="mb-3">
-                        <label for="nom" class="form-label">Nom du Restaurant<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="nom" th:field="*{nom}" placeholder="Le Nom de Votre Restaurant" required>
+                        <label for="email" class="form-label">Adresse Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" th:field="*{description}" rows="3" placeholder="Décrivez brièvement votre restaurant..."></textarea>
-                    </div> 
-                </div> 
-                <div class="lol">
-                    <div class="mb-3">
-                        <label for="adresse" class="form-label">Adresse Complète<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="adresse" th:field="*{adresse}" placeholder="123 Rue Principale, Ville, Code Postal" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="telephone" class="form-label">Numéro de Téléphone<span class="text-danger">*</span></label>
-                        <input type="tel" class="form-control" id="telephone" th:field="*{telephone}" placeholder="0123456789" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="horaires" class="form-label">Horaires d'ouverture</label>
-                        <input type="text" class="form-control" id="horaires" th:field="*{horaires}" placeholder="Ex: Lun-Ven: 9h-22h, Sam: 10h-23h">
-                    </div>
-                    <div class="mb-3">
-                        <label for="logoUrl" class="form-label">URL du Logo (Optionnel)</label>
-                        <input type="url" class="form-control" id="logoUrl" th:field="*{logoUrl}" placeholder="https://example.com/votre_logo.png">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Mot de passe <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmer <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                        </div>
                     </div>
                 </fieldset>
-
-                <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary">Créer le compte</button>
                 </div>
-        </form>
+            </form>
 
-            <p class="text-center mt-5">
-                Déjà un compte ? <a th:href="@{/login}">Connectez-vous ici</a>
+            <p class="text-center mt-4">
+                Déjà un compte ? <a th:href="@{/login}" style="color: var(--primary-color);">Connectez-vous</a>
             </p>
-            <p class="text-center mt-2">
-                <a th:href="@{/}">Retour à l'accueil</a>
-            </p>
-         </div>
-    </div>
+        </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

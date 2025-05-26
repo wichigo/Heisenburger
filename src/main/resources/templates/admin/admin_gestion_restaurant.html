@@ -4,48 +4,110 @@
     <meta charset="UTF-8">
     <title>Gestion des Restaurants</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        body { background: linear-gradient(to bottom right, #e70b03, #e6870b);}
-        .action-btn { margin-right: 5px; margin-bottom: 5px;}
-        .table-responsive-sm { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .table th.col-actions, .table td.col-actions { width: auto; /* Adjusted for potentially more buttons or responsive behavior */ min-width: 280px; }
-        .table th.col-statut, .table td.col-statut { width: 120px; }
-        .table th.col-id, .table td.col-id { width: 80px; }
-        .navbar-brand img { max-height: 40px; margin-right: 15px; }
-        .nav-link.btn-custom-gray {
-            background-color: #d3d3d3; color: #333; border-radius: 0.25rem;
-            padding: 0.375rem 0.75rem; margin-left: 5px; margin-right: 5px;
+        :root {
+            --primary-gradient: linear-gradient(to bottom right, #e70b03, #e6870b);
+            --card-shadow-fade: 0 4px 50px rgba(230, 135, 11, 0.3);
+            --text-dark: #333;
         }
-        .nav-link.btn-custom-gray:hover { background-color: #bfbfbf; color: #333; }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--primary-gradient);
+            padding-top: 80px;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .navbar .nav-link, .navbar .navbar-text, .navbar-brand {
+            color: #f1f1f1 !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .navbar .btn-danger { color: #f1f1f1 !important; border-color: rgba(255,255,255,0.5); }
+        .navbar-brand img { max-height: 40px; }
+
+        .page-layout {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: stretch;
+            gap: 30px;
+            width: 100%;
+            max-width: 90%;
+            padding: 20px 0;
+        }
+        
+        .dashboard-column-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            color: var(--text-dark);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow-fade);
+            padding: 30px;
+            height: 60vh;
+            max-width: 800px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-column-container:hover {
+            transform: translateY(-55px);
+            box-shadow: 0 10px 60px rgba(231, 11, 3, 0.3);
+        }
+
+        .dashboard-column-container h4 {
+            color: var(--text-dark);
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-container { position: fixed; top: 80px; width: 50%; left: 25%; z-index: 1050; }
+        
+        .table { color: var(--text-dark); }
+        .table a { color: #e70b03; font-weight: 500; }
+        .details-card strong { color: #e70b03; }
+        .btn-action-group .btn-outline-info { color: #0dcaf0; border-color: #0dcaf0; }
+        .btn-action-group .btn-outline-info:hover { background-color: #0dcaf0; color: white; }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .page-layout { flex-direction: column; align-items: center; max-width: 95%; }
+        }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-light border-bottom">
+
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/admin/dashboard}">
-             Heisenburger Admin
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <a class="navbar-brand" th:href="@{/admin/dashboard}"><img src="/images/Heisenberg.svg" alt="Logo"></a>
+        <div class="collapse navbar-collapse">
             <div class="navbar-nav me-auto">
-                <a class="nav-link btn-custom-gray" th:href="@{/admin_gestion_restaurant}" >Restaurants</a>
-                <a class="nav-link btn-custom-gray" th:href="@{/admin_gestion_client}" >Clients</a>
-                <a class="nav-link btn-custom-gray" th:href="@{/admin_gestion_commande}" >Commandes</a>
-                <a class="nav-link btn-custom-gray" href="#">Statistiques</a>
+                <a class="nav-link" th:href="@{/admin_gestion_restaurant}">Restaurants</a>
+                <a class="nav-link" th:href="@{/admin_gestion_client}">Clients</a>
+                <a class="nav-link" th:href="@{/admin_gestion_commande}">Commandes</a>
             </div>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3" th:if="${user != null}"
-                      th:text="'Bienvenue Admin ' + ${user.nom} + ' ' + ${user.prenom}"></span>
-                <a class="nav-link btn-custom-gray" href="#">Profil</a>
-                <a th:href="@{/logout}" class="btn btn-danger">Déconnexion</a>
+            <div class="navbar-nav ms-auto d-flex align-items-center">
+                <span class="navbar-text me-3" th:if="${user != null}" th:text="'Admin: ' + ${user.prenom}"></span>
+                <a class="nav-link" th:href="@{/admin_profil}"><i class="bi bi-person-circle"></i> Profil</a>
+                <a th:href="@{/logout}" class="btn btn-outline-light ms-2"><i class="bi bi-box-arrow-right"></i></a>
             </div>
         </div>
     </div>
 </nav>
 
-<div class="container-fluid mt-4">
+<div class="alert-container">
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
         <span th:text="${successMessage}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -54,99 +116,77 @@
         <span th:text="${errorMessage}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-lg-7 mb-4">
-            <h4>Liste des Restaurants</h4>
-            <div th:if="${allRestaurants != null && !allRestaurants.isEmpty()}" class="table-responsive-sm">
-                <table class="table table-striped table-bordered">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th class="col-id">ID Resto</th>
-                            <th>Nom</th>
-                            <th>Adresse</th>
-                            <th class="col-statut">Statut</th>
-                            <th class="col-actions">Actions</th>
-                        </tr>
-                    </thead>
+<main class="page-layout">
+
+    <div class="dashboard-column-container">
+        <h4><i class="bi bi-list-ul"></i> Liste des Restaurants</h4>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>ID</th><th>Nom</th><th>Statut</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="resto : ${allRestaurants}" th:classappend="${selectedRestaurant?.idRestaurant == resto.idRestaurant} ? 'table-active' : ''">
+                        <td th:text="${resto.idRestaurant}"></td>
+                        <td><a th:href="@{/admin_gestion_restaurant(idRestaurant=${resto.idRestaurant})}" th:text="${resto.nom}"></a></td>
+                        <td><span th:text="${resto.statut}" th:classappend="${#strings.equalsIgnoreCase(resto.statut, 'actif')} ? 'text-success' : 'text-warning'"></span></td>
+                        <td class="btn-action-group d-flex">
+                             <form th:action="@{/admin/restaurant/toggle-statut/{id}(id=${resto.idRestaurant})}" method="post" class="me-1">
+                                <button type="submit" class="btn btn-sm" th:classappend="${#strings.equalsIgnoreCase(resto.statut, 'actif') ? 'btn-outline-warning' : 'btn-outline-success'}" th:title="${#strings.equalsIgnoreCase(resto.statut, 'actif') ? 'Désactiver' : 'Activer'}">
+                                    <i th:classappend="${#strings.equalsIgnoreCase(resto.statut, 'actif') ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+                                </button>
+                            </form>
+                            <a th:href="@{/admin/restaurant/modifier/{id}(id=${resto.idRestaurant})}" class="btn btn-sm btn-outline-info me-1" title="Modifier"><i class="bi bi-pencil"></i></a>
+                            <a th:href="@{/admin/restaurant/logo/{id}(id=${resto.idRestaurant})}" class="btn btn-sm btn-outline-secondary me-1" title="Logo"><i class="bi bi-image"></i></a>
+                            <form th:action="@{/admin/restaurant/supprimer/{id}(id=${resto.idRestaurant})}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer ce restaurant ?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dashboard-column-container">
+        <h4><i class="bi bi-info-circle"></i> Détails du Restaurant</h4>
+        <div th:if="${selectedRestaurant != null}" class="details-card">
+            <h5 class="mb-3" th:text="${selectedRestaurant.nom}"></h5>
+            <div class="row">
+                 <div th:classappend="${selectedRestaurant.logoUrl != null} ? 'col-md-8' : 'col-md-12'">
+                    <p><strong>Email:</strong> <span th:text="${selectedRestaurant.email}"></span></p>
+                    <p><strong>Adresse:</strong> <span th:text="${selectedRestaurant.adresse}"></span></p>
+                    <p><strong>Téléphone:</strong> <span th:text="${selectedRestaurant.telephone}"></span></p>
+                    <p><strong>Horaires:</strong> <span th:text="${selectedRestaurant.horaires}"></span></p>
+                </div>
+                <div class="col-md-4 text-center" th:if="${selectedRestaurant.logoUrl != null and !selectedRestaurant.logoUrl.isEmpty()}">
+                    <img th:src="${selectedRestaurant.logoUrl}" alt="Logo" class="img-thumbnail" style="max-width: 120px;">
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h6>Menu</h6>
+            <div th:if="${!#lists.isEmpty(selectedRestaurantMenu)}" class="table-responsive" style="max-height: 250px;">
+                <table class="table table-sm table-striped">
                     <tbody>
-                        <tr th:each="resto : ${allRestaurants}" th:classappend="${selectedRestaurant != null && resto.idRestaurant == selectedRestaurant.idRestaurant} ? 'table-active' : ''">
-                            <td th:text="${resto.idRestaurant}">ID</td>
-                            <td>
-                                <a th:href="@{/admin_gestion_restaurant(idRestaurant=${resto.idRestaurant})}"
-                                   th:text="${resto.nom}">Nom du Restaurant</a>
-                            </td>
-                            <td th:text="${resto.adresse}">Adresse</td>
-                            <td th:text="${resto.statut}">Statut</td>
-                            <td class="col-actions">
-                                <form th:action="@{/admin/restaurant/toggle-statut/{idRestaurant}(idRestaurant=${resto.idRestaurant})}" method="post" style="display: inline;">
-                                    <button type="submit" class="btn btn-sm btn-warning action-btn"
-                                            th:text="${#strings.equalsIgnoreCase(resto.statut, 'actif') ? 'Rendre Inactif' : 'Rendre Actif'}">
-                                        Changer Statut
-                                    </button>
-                                </form>
-                                <a th:href="@{/admin/restaurant/modifier/{idRestaurant}(idRestaurant=${resto.idRestaurant})}" class="btn btn-sm btn-primary action-btn">Modifier</a>
-                                <a th:href="@{/admin/restaurant/logo/{idRestaurant}(idRestaurant=${resto.idRestaurant})}" class="btn btn-sm btn-info action-btn">Logo</a>
-                                <form th:action="@{/admin/restaurant/supprimer/{idRestaurant}(idRestaurant=${resto.idRestaurant})}" method="post" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce restaurant ? Cette action est irréversible et supprimera également tous les plats associés.');">
-                                    <button type="submit" class="btn btn-sm btn-danger action-btn">Supprimer</button>
-                                </form>
-                            </td>
+                        <tr th:each="plat : ${selectedRestaurantMenu}">
+                            <td th:text="${plat.nom}"></td>
+                            <td th:text="${#numbers.formatDecimal(plat.prix, 1, 'COMMA', 2, 'POINT')} + ' €'"></td>
+                            <td><i th:classappend="${#strings.equalsIgnoreCase(plat.disponible, 'true')} ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div th:if="${allRestaurants == null || allRestaurants.isEmpty()}">
-                <p>Aucun restaurant enregistré.</p>
-            </div>
+             <div th:if="${#lists.isEmpty(selectedRestaurantMenu)}" class="alert alert-light">Ce restaurant n'a pas encore de menu.</div>
         </div>
-
-        <div class="col-lg-5">
-            <div th:if="${selectedRestaurant != null}">
-                <h4 th:text="'Menu de : ' + ${selectedRestaurant.nom}">Menu du Restaurant</h4>
-                <div th:if="${selectedRestaurantMenu != null && !selectedRestaurantMenu.isEmpty()}" class="table-responsive-sm">
-                    <table class="table table-sm table-bordered">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Plat</th>
-                                <th>Prix</th>
-                                <th>Disponible</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="plat : ${selectedRestaurantMenu}">
-                                <td th:text="${plat.nom}">Nom du plat</td>
-                                <td th:text="${#numbers.formatDecimal(plat.prix, 1, 'COMMA', 2, 'POINT')} + ' €'">Prix</td>
-                                <td>
-                                   <span th:if="${plat.disponible != null && #strings.equalsIgnoreCase(plat.disponible, 'true')}" class="badge bg-success">Oui</span>
-                                   <span th:unless="${plat.disponible != null && #strings.equalsIgnoreCase(plat.disponible, 'true')}" class="badge bg-danger">Non</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div th:if="${selectedRestaurantMenu == null || selectedRestaurantMenu.isEmpty()}">
-                    <p>Ce restaurant n'a pas encore de menu défini ou aucun plat n'est disponible.</p>
-                </div>
-                 <hr th:if="${selectedRestaurant != null}">
-                <h5>Informations du Restaurant Sélectionné</h5>
-                <p><strong>ID Login (User ID):</strong> <span th:text="${selectedRestaurant.id}"></span></p>
-                <p><strong>ID Restaurant (Table PK):</strong> <span th:text="${selectedRestaurant.idRestaurant}"></span></p>
-                <p><strong>Email:</strong> <span th:text="${selectedRestaurant.email}"></span></p>
-                <p><strong>Description:</strong> <span th:text="${selectedRestaurant.description}"></span></p>
-                <p><strong>Téléphone:</strong> <span th:text="${selectedRestaurant.telephone}"></span></p>
-                <p><strong>Horaires:</strong> <span th:text="${selectedRestaurant.horaires}"></span></p>
-                <p><strong>Date d'inscription:</strong> <span th:text="${selectedRestaurant.dateInscription != null ? #temporals.format(selectedRestaurant.dateInscription, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span></p>
-                <div th:if="${selectedRestaurant.logoUrl != null && !selectedRestaurant.logoUrl.trim().isEmpty()}">
-                    <p><strong>Logo:</strong></p>
-                    <img th:src="${selectedRestaurant.logoUrl}" alt="Logo" style="max-width: 150px; max-height: 150px;" class="img-thumbnail"/>
-                </div>
-            </div>
-            <div th:unless="${selectedRestaurant != null}" class="alert alert-info">
-                <p>Sélectionnez un restaurant dans la liste de gauche pour voir son menu et gérer ses informations.</p>
-            </div>
+        <div th:unless="${selectedRestaurant != null}" class="alert alert-secondary mt-3">
+            Sélectionnez un restaurant pour voir ses informations.
         </div>
     </div>
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
