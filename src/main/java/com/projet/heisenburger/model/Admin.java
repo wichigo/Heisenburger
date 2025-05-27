@@ -9,12 +9,10 @@ import jakarta.persistence.Table;
 @DiscriminatorValue("ADMIN") // Valeur pour la colonne role
 public class Admin extends User {
 
-    // Pas d'attribut supplémentaire pour Admin dans cet exemple [cite: 32]
     private String role_admin;
     private String nom;
     private String prenom;
 
-    // Constructeurs, getters et setters
     public Admin() {
         super();
         

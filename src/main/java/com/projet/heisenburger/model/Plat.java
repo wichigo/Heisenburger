@@ -20,15 +20,14 @@ public class Plat {
     private String disponible;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_restaurant", referencedColumnName = "id_restaurant") // MODIFICATION ICI
+    @JoinColumn(name = "id_restaurant", referencedColumnName = "id_restaurant")
     private Restaurant restaurant;
 
     @ManyToOne(fetch = FetchType.EAGER) 
     @JoinColumn(name = "id_categorie") 
     private Categorie categorie;
 
-    // Constructeurs, Getters et Setters...
-    // (Le reste de la classe reste inchangé)
+
     
     public Plat() {
     }

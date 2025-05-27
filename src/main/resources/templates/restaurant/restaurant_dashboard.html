@@ -13,24 +13,23 @@
             --text-dark: #333;
             --text-light: #f1f1f1;
             --primary-color: #e70b03;
-             --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15); /* Ajouté depuis admin_dashboard */
-            --card-border: 1px solid rgba(255, 255, 255, 0.18); /* Ajouté depuis admin_dashboard */
+             --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            --card-border: 1px solid rgba(255, 255, 255, 0.18); 
         }
 
         body {
             display: flex;
             flex-direction: column;
-            /* justify-content: center; */ /* Permet au contenu de commencer en haut */
             align-items: center;
             min-height: 100vh;
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: var(--primary-gradient);
-            color: var(--text-light); /* Texte principal clair sur fond dégradé */
+            color: var(--text-light);
             padding-top: 80px; 
         }
 
-        .navbar { /* Style Glassmorphism de l'admin */
+        .navbar {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -40,7 +39,7 @@
         .navbar-brand img {
             max-height: 40px;
         }
-        .navbar .nav-link, .navbar .navbar-text, .navbar-brand span, .navbar-brand { /* Texte navbar clair */
+        .navbar .nav-link, .navbar .navbar-text, .navbar-brand span, .navbar-brand { 
             color: var(--text-light) !important;
              text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
@@ -53,28 +52,28 @@
         }
 
 
-        .page-layout { /* Similaire à admin_dashboard */
+        .page-layout { 
             display: flex;
             justify-content: space-evenly;
             align-items: stretch; 
             gap: 30px;
             width: 100%;
-            max-width: 90%; /* ou 1200px comme admin_gestion_restaurant */
+            max-width: 90%;
             padding: 20px 0;
-            margin-top: 1rem; /* Espace après la navbar */
+            margin-top: 1rem; 
         }
 
-        .dashboard-column-container { /* Similaire à admin_dashboard */
+        .dashboard-column-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background-color: rgb(255, 255, 255); /* Fond blanc pour la carte */
-            color: var(--text-dark); /* Texte foncé dans la carte */
+            background-color: rgb(255, 255, 255);
+            color: var(--text-dark); 
             border-radius: 20px;            
             padding: 30px 40px;
-            max-width: 550px; /* Peut être ajusté */
-            /* height: auto; */ /* Hauteur automatique pour s'adapter au contenu */
-            min-height: 40vh; /* Hauteur minimale */
+            max-width: 550px;
+
+            min-height: 40vh;
             box-shadow: var(--card-shadow-fade);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -113,17 +112,17 @@
         }
         .welcome-text strong {
             font-weight: 500;
-            color: #fff; /* Ou une autre couleur si var(--text-light) ne convient pas */
+            color: #fff;
         }
 
 
-        @media (max-width: 991.98px) { /* Ajustements responsives */
+        @media (max-width: 991.98px) {
             .page-layout {
                 flex-direction: column;
                 align-items: center;
             }
             .dashboard-column-container {
-                max-width: 90%; /* Prend plus de largeur */
+                max-width: 90%; 
                 margin-bottom: 20px;
             }
         }

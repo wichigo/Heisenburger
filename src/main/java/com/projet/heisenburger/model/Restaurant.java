@@ -31,12 +31,9 @@ public class Restaurant extends User {
 
 
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER) // fetch = FetchType.EAGER peut simplifier pour l'instant, sinon LAZY et gérer la session/transaction
-    private List<Plat> plats = new ArrayList<>(); // Décommenté et initialisé
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
+    private List<Plat> plats = new ArrayList<>(); 
 
-    // mappedBy="restaurant" indique que l'entité Plat gère la relation (via son champ 'restaurant')
-    // CascadeType.ALL: les opérations (persist, merge, remove, refresh, detach) sur Restaurant sont propagées à Plats.
-    // orphanRemoval=true: si un Plat est retiré de la liste 'plats' du Restaurant, il sera supprimé de la BDD.
 
     public Restaurant() {
         super();
@@ -135,7 +132,6 @@ public class Restaurant extends User {
 
 
 
-    // Getter et Setter pour la liste des plats
     public List<Plat> getPlats() {
         return plats;
     }
@@ -144,14 +140,4 @@ public class Restaurant extends User {
         this.plats = plats;
     }
 
-    // // Méthodes utilitaires pour gérer la relation bidirectionnelle (bonne pratique)
-    // public void addPlat(Plat plat) {
-    //     plats.add(plat);
-    //     plat.setRestaurant(this);
-    // }
-
-    // public void removePlat(Plat plat) {
-    //     plats.remove(plat);
-    //     plat.setRestaurant(null);
-    // }
 }

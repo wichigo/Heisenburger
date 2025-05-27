@@ -116,7 +116,6 @@ public class Commande {
                ", statut=" + statut +
                ", montantTotal=" + montant_total +
                ", adresseLivraison=" + adresse_livraison +
-               // Adaptez en fonction des ID réels de Client et Restaurant
                ", client=" + (client != null ? client.getId() : "null") + 
                ", restaurant=" + (restaurant != null ? restaurant.getId() : "null") +
                "]";

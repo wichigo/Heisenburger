@@ -76,11 +76,10 @@ public class AuthController {
 
             redirectAttributes.addFlashAttribute("successMessage", "Inscription réussie " +
                     ((Client) savedClient).getPrenom() + "! Vous pouvez maintenant vous connecter.");
-            return "redirect:/login"; // Rediriger vers la page de connexion après une inscription réussie
+            return "redirect:/login";
 
         } catch (Exception e) {
             model.addAttribute("error", "Une erreur est survenue lors de l'inscription: " + e.getMessage());
-            // model.addAttribute("client", client);
             return "/client/client_inscription";
         }
     }
@@ -107,7 +106,7 @@ public class AuthController {
             model.addAttribute("error", "Un compte existe déjà avec cet email.");
             return "/restaurant/restaurant_inscription";
         }
-        restaurant.setStatut("inactif");
+        restaurant.setStatut("inactif");// Les restaurants sont inactifs par défaut à l'inscription
         restaurant.setDateInscription(LocalDateTime.now());
         try {
             Restaurant savedRestaurant = restaurantRepository.save(restaurant);
@@ -126,7 +125,7 @@ public class AuthController {
                         @RequestParam String password,
                         HttpSession session,
                         Model model, // Ajouté pour pouvoir utiliser redirectAttributes dans les autres méthodes
-                        RedirectAttributes redirectAttributes) { // Ajouté
+                        RedirectAttributes redirectAttributes) {
         if (authService.authenticate(email, password)) {
             User user = authService.findUser(email);
             session.setAttribute("user", user);
@@ -167,7 +166,7 @@ public class AuthController {
 
     // Tableau de bord Restaurant
     @GetMapping("/restaurant/dashboard")
-    public String restaurantDashboard(HttpSession session, Model model, RedirectAttributes redirectAttributes) { // Ajouté RedirectAttributes
+    public String restaurantDashboard(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Object userAttribute = session.getAttribute("user");
         if (!(userAttribute instanceof Restaurant)) {
             return "redirect:/login";

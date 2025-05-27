@@ -28,7 +28,6 @@ public class PlatController {
     @Autowired
     private PlatRepository platRepository;
 
-    // Méthode pour vérifier si l'utilisateur est un restaurant connecté
     protected Restaurant getAuthenticatedRestaurant(HttpSession session) {
         Object userAttribute = session.getAttribute("user");
         if (userAttribute instanceof Restaurant) {
@@ -37,12 +36,11 @@ public class PlatController {
         return null;
     }
 
-    // GET /restaurant/plats : Lister les plats du restaurant connecté
     @GetMapping
     public String listPlats(HttpSession session, Model model) {
         Restaurant restaurant = getAuthenticatedRestaurant(session);
         if (restaurant == null) {
-            return "redirect:/login"; // Redirige si non connecté ou pas un restaurant
+            return "redirect:/login";
         }
 
         List<Plat> plats = platRepository.findByRestaurant(restaurant); 
@@ -51,7 +49,6 @@ public class PlatController {
         return "restaurant/restaurant_plats";
     }
 
-    // GET /restaurant/plats/new : Afficher le formulaire pour ajouter un nouveau plat
     @GetMapping("/new")
     public String showNewPlatForm(HttpSession session, Model model) {
         Restaurant restaurant = getAuthenticatedRestaurant(session);
@@ -59,8 +56,8 @@ public class PlatController {
             return "redirect:/login";
         }
         model.addAttribute("plat", new Plat());
-        List<Categorie> categories = categorieRepository.findAll(); // Charger les catégories
-        model.addAttribute("allCategories", categories);            // Les ajouter au modèle
+        List<Categorie> categories = categorieRepository.findAll();
+        model.addAttribute("allCategories", categories);    
         model.addAttribute("pageTitle", "Ajouter un nouveau plat");
         return "restaurant/restaurant_plat_form";
     }
@@ -74,7 +71,6 @@ public class PlatController {
             return "redirect:/login";
         }
 
-        // Associer le plat au restaurant connecté avant de sauvegarder
         plat.setRestaurant(restaurant);
         platRepository.save(plat);
 
@@ -100,8 +96,8 @@ public class PlatController {
                 return "redirect:/restaurant/plats";
             }
             model.addAttribute("plat", plat);
-            List<Categorie> categories = categorieRepository.findAll(); // Charger les catégories
-            model.addAttribute("allCategories", categories);            // Les ajouter au modèle
+            List<Categorie> categories = categorieRepository.findAll();
+            model.addAttribute("allCategories", categories);         
             model.addAttribute("pageTitle", "Modifier le plat : " + plat.getNom());
             return "restaurant/restaurant_plat_form";
         } else {
@@ -110,7 +106,6 @@ public class PlatController {
         }
     }
 
-    // GET /restaurant/plats/delete/{id} : Supprimer un plat
     @GetMapping("/delete/{id}")
     public String deletePlat(@PathVariable("id") int id,
                              HttpSession session,

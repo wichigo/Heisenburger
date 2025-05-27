@@ -13,8 +13,7 @@
             --shadow-color: rgba(0, 0, 0, 0.1);
             --text-color: #333;
             --border-radius: 20px;
-            --primary-color: #e70b03; /* Ajouté pour cohérence */
-        }
+            --primary-color: #e70b03;
 
         body {
             margin: 0;
@@ -28,19 +27,17 @@
             padding: 20px;
         }
 
-        /* Bouton en haut à droite (similaire à login.html) */
         .top-right-button {
             position: absolute;
             top: 20px;
             right: 20px;
         }
         
-        /* Logo en haut à gauche (similaire à client_inscription) */
         .top-left-logo-link {
             position: absolute;
             top: 20px;
             left: 20px;
-            z-index: 10; /* Pour s'assurer qu'il est cliquable */
+            z-index: 10; 
         }
 
 
@@ -52,13 +49,13 @@
             max-width: 1500px;
         }
 
-        .form-image-container { /* Renommé pour clarté */
+        .form-image-container {
             flex: 1.1; 
-            display: none; /* Caché par défaut, visible sur grands écrans */
+            display: none; 
             border-radius: var(--border-radius);
             box-shadow: 0 15px 35px var(--shadow-color);
             overflow: hidden;
-            max-width: 45%; /* Similaire à login.html */
+            max-width: 45%;
         }
 
         .form-image-container img {
@@ -68,43 +65,43 @@
             display: block;
         }
         
-        .form-container { /* Renommé pour clarté */
-            flex: 1.2; /* Un peu plus d'espace pour le formulaire d'inscription */
+        .form-container { 
+            flex: 1.2;
             background-color: var(--card-background);
             border-radius: var(--border-radius);
             box-shadow: 0 15px 35px var(--shadow-color);
-            padding: 30px 40px; /* Ajusté */
+            padding: 30px 40px; 
             display: flex;
             flex-direction: column;
             justify-content: center;
             width: 100%;
-            max-width: 520px; /* Légèrement augmenté */
+            max-width: 520px;
         }
 
         .logo {
-            width: 70px; /* Ajusté */
+            width: 70px; 
             height: auto;
-            margin-bottom: 15px; /* Ajusté */
+            margin-bottom: 15px;
             align-self: center;
         }
         
         .form-title {
             text-align: center;
-            margin-bottom: 20px; /* Ajusté */
+            margin-bottom: 20px;
             font-weight: 700;
-            font-size: 1.75rem; /* Ajusté */
+            font-size: 1.75rem; 
         }
-        .form-subtitle { /* Ajouté pour le sous-titre */
+        .form-subtitle { 
             text-align: center;
             color: #6c757d;
-            margin-bottom: 25px; /* Ajusté */
+            margin-bottom: 25px;
         }
 
 
         .form-control {
             border-radius: 8px;
-            padding: 10px 12px; /* Ajusté */
-            font-size: 0.95rem; /* Ajusté */
+            padding: 10px 12px; 
+            font-size: 0.95rem; 
         }
 
         .form-control:focus {
@@ -112,23 +109,23 @@
             border-color: #e6870b;
         }
 
-        .btn-submit { /* Nom de classe pour le bouton principal */
+        .btn-submit { 
             background-color: var(--primary-color);
             border: none;
-            padding: 10px; /* Ajusté */
+            padding: 10px;
             border-radius: 8px;
             font-weight: 600;
             transition: background-color 0.3s ease;
-            font-size: 1rem; /* Ajusté */
+            font-size: 1rem;
         }
 
         .btn-submit:hover {
             background-color: #c40a03;
         }
         
-        .bottom-link { /* Nom de classe pour le lien en bas */
+        .bottom-link { 
             text-align: center;
-            margin-top: 20px; /* Ajusté */
+            margin-top: 20px;
             font-size: 0.9rem;
         }
         .bottom-link a {

@@ -6,15 +6,15 @@ import jakarta.persistence.*;
 @Table(name = "login") // Conserve le nom de table
 @Inheritance(strategy = InheritanceType.JOINED) // Stratégie d'héritage
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING) // Colonne pour distinguer les types d'utilisateurs
-public abstract class User { // La classe devient abstraite
+public abstract class User { 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_login")
-    protected int id; // Passage en protected pour l'accès par les sous-classes
+    protected int id; 
 
-    protected String email; // Passage en protected
-    protected String password; // Passage en protected
+    protected String email; 
+    protected String password;
 
     // Constructeur par défaut (requis par JPA)
     public User() {
@@ -26,7 +26,6 @@ public abstract class User { // La classe devient abstraite
         this.password = password;
     }
 
-    // Getters
     public int getId() {
         return id;
     }
@@ -39,7 +38,6 @@ public abstract class User { // La classe devient abstraite
         return password;
     }
 
-    // Setters
     public void setId(int id) {
         this.id = id;
     }
@@ -57,7 +55,6 @@ public abstract class User { // La classe devient abstraite
         return "User{" +
                "id=" + id +
                ", email='" + email + "'" +
-               // Ne pas inclure le mot de passe
                ", userType='" + (this.getClass().isAnnotationPresent(DiscriminatorValue.class) ? this.getClass().getAnnotation(DiscriminatorValue.class).value() : "N/A") + "'" +
                '}';
     }

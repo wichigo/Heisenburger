@@ -22,10 +22,9 @@
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: var(--primary-gradient);
-            padding-top: 80px; /* Space for fixed navbar */
+            padding-top: 80px; 
         }
 
-        /* Navbar Styles (Glassmorphism) */
         .navbar {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -39,7 +38,6 @@
         .navbar .btn-danger { color: #f1f1f1 !important; border-color: rgba(255,255,255,0.5); }
         .navbar-brand img { max-height: 40px; }
 
-        /* Main Layout for single centered card */
         .main-content {
             display: flex;
             justify-content: center;
@@ -48,18 +46,17 @@
             padding: 20px;
         }
         
-        /* White Card Style for the form */
         .form-container-card {
             background: #ffffff;
             color: var(--text-dark);
-            border-radius: 20px; /* Correspondance avec admin_gestion_restaurant */
+            border-radius: 20px; 
             box-shadow: var(--card-shadow-fade);
-            padding: 30px 40px; /* Correspondance avec admin_gestion_restaurant */
+            padding: 30px 40px; 
             width: 100%;
-            max-width: 700px; /* Ajusté pour un formulaire unique, peut être modifié */
+            max-width: 700px; 
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .form-container-card:hover { /* Effet optionnel, peut être retiré si non désiré */
+        .form-container-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 60px rgba(231, 11, 3, 0.3);
         }

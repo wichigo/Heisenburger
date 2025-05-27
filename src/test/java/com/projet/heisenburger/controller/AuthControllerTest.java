@@ -89,7 +89,7 @@ public class AuthControllerTest {
     void registerClient_emailAlreadyExists_returnsError() {
         Client client = new Client("test@example.com", "password", "1234567890", "Test", "Client", "123 Main St", "City");
         String confirmPassword = "password";
-        when(userRepository.findByEmail(client.getEmail())).thenReturn(Optional.of(new Client())); // Use Client instead of User
+        when(userRepository.findByEmail(client.getEmail())).thenReturn(Optional.of(new Client()));
 
         String viewName = authController.registerClient(client, confirmPassword, model, redirectAttributes);
 
@@ -100,10 +100,10 @@ public class AuthControllerTest {
 
     @Test
     void registerClient_successfulRegistration_redirectsToLogin() {
-        Client client = mock(Client.class); // Mock the Client object
+        Client client = mock(Client.class);
         when(client.getEmail()).thenReturn("new@example.com");
         when(client.getPassword()).thenReturn("password");
-        when(client.getPrenom()).thenReturn("New"); // Mock getPrenom for success message
+        when(client.getPrenom()).thenReturn("New");
         String confirmPassword = "password";
         when(userRepository.findByEmail(client.getEmail())).thenReturn(Optional.empty());
         when(userRepository.save(any(Client.class))).thenReturn(client);
@@ -140,7 +140,7 @@ public class AuthControllerTest {
     void registerRestaurant_emailAlreadyExists_returnsError() {
         Restaurant restaurant = new Restaurant("resto@example.com", "password", "Resto Test", "Desc", "Addr", "123", "logo.png", "inactif", null, "H");
         String confirmPassword = "password";
-        when(userRepository.findByEmail(restaurant.getEmail())).thenReturn(Optional.of(new Restaurant())); // Use Restaurant instead of User
+        when(userRepository.findByEmail(restaurant.getEmail())).thenReturn(Optional.of(new Restaurant()));
 
         String viewName = authController.registerRestaurant(restaurant, confirmPassword, model, redirectAttributes);
 
@@ -151,10 +151,10 @@ public class AuthControllerTest {
 
     @Test
     void registerRestaurant_successfulRegistration_redirectsToLogin() {
-        Restaurant restaurant = mock(Restaurant.class); // Mock the Restaurant object
+        Restaurant restaurant = mock(Restaurant.class);
         when(restaurant.getEmail()).thenReturn("newresto@example.com");
         when(restaurant.getPassword()).thenReturn("password");
-        when(restaurant.getNom()).thenReturn("New Resto"); // Mock getNom for success message
+        when(restaurant.getNom()).thenReturn("New Resto");
         String confirmPassword = "password";
         when(userRepository.findByEmail(restaurant.getEmail())).thenReturn(Optional.empty());
         when(restaurantRepository.save(any(Restaurant.class))).thenReturn(restaurant);
