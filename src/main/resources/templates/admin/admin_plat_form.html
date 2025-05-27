@@ -2,12 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${pageTitle ?: 'Modifier Logo'}">Modifier Logo</title>
+    <title th:text="${pageTitle ?: 'Formulaire Plat'}">Formulaire Plat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-     <style>
+    <style>
         body { background-color: #f8f9fa; padding-top: 20px; }
         .container { max-width: 700px; }
-        .logo-preview { max-width: 200px; max-height: 200px; margin-top: 10px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -36,30 +35,40 @@
 </nav>
 
 <div class="container mt-5 pt-5">
-    <h2 th:text="${pageTitle ?: 'Modifier le Logo du Restaurant'}">Modifier le Logo</h2>
+    <h2 th:text="${pageTitle ?: 'Ajouter/Modifier un Plat'}">Ajouter/Modifier un Plat</h2>
 
-    <form th:action="@{/admin/restaurant/logo/save}" th:object="${restaurant}" method="post" enctype="multipart/form-data" class="mt-4">
-        <input type="hidden" th:field="*{id}" /> <input type="hidden" th:field="*{idRestaurant}" /> <div class="mb-3">
-            <label for="nom" class="form-label">Restaurant:</label>
-            <input type="text" class="form-control" id="nom" th:value="*{nom}" readonly />
+    <form th:action="@{/admin/restaurant/menu/{idRestaurant}/save(idRestaurant=${restaurant.idRestaurant})}" th:object="${plat}" method="post" class="mt-4">
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{restaurant}" />
+
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom du Plat:</label>
+            <input type="text" class="form-control" id="nom" th:field="*{nom}" required />
         </div>
 
         <div class="mb-3">
-            <label for="logoFile" class="form-label">Télécharger un nouveau Logo:</label>
-            <input type="file" class="form-control" id="logoFile" name="logoFile" accept="image/*" />
+            <label for="description" class="form-label">Description:</label>
+            <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
         </div>
 
-        <div th:if="*{logoUrl != null && !logoUrl.trim().isEmpty()}">
-            <p>Aperçu actuel:</p>
-            <img th:src="*{logoUrl}" alt="Logo actuel" class="logo-preview img-thumbnail" />
+        <div class="mb-3">
+            <label for="prix" class="form-label">Prix (€):</label>
+            <input type="number" step="0.01" class="form-control" id="prix" th:field="*{prix}" required />
         </div>
-        <div class="mb-3" th:if="*{logoUrl == null || logoUrl.trim().isEmpty()}">
-            <p>Aucun logo défini actuellement.</p>
+
+        <div class="mb-3">
+            <label for="categorie" class="form-label">Catégorie:</label>
+            <input type="text" class="form-control" id="categorie" th:field="*{categorie}" required />
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="disponible" th:field="*{disponible}" />
+            <label class="form-check-label" for="disponible">Disponible</label>
         </div>
         
         <hr>
-        <button type="submit" class="btn btn-primary">Télécharger le Logo</button>
-        <a th:href="@{/admin_gestion_restaurant(idRestaurant=${restaurant.idRestaurant})}" class="btn btn-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary">Enregistrer le Plat</button>
+        <a th:href="@{/admin/restaurant/menu/{idRestaurant}(idRestaurant=${restaurant.idRestaurant})}" class="btn btn-secondary">Annuler</a>
     </form>
 </div>
 

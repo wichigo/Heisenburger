@@ -5,6 +5,7 @@ import com.projet.heisenburger.model.Commande;
 import com.projet.heisenburger.model.Plat;
 import com.projet.heisenburger.model.Restaurant;
 import com.projet.heisenburger.repository.CommandeRepository;
+import com.projet.heisenburger.repository.PlatRepository;
 import com.projet.heisenburger.repository.RestaurantRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -17,11 +18,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -32,6 +39,9 @@ public class AdminController {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private PlatRepository platRepository;
 
     // Refactored authentication check
     private Admin getAuthenticatedAdmin(HttpSession session) {
@@ -170,6 +180,133 @@ public class AdminController {
         return "redirect:/admin_gestion_restaurant";
     }
 
+    @GetMapping("/admin/restaurant/menu/{idRestaurant}")
+    public String showRestaurantMenu(@PathVariable("idRestaurant") int idRestaurant, Model model,
+                                     HttpSession session, RedirectAttributes redirectAttributes) {
+        Admin admin = getAuthenticatedAdmin(session);
+        if (admin == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", admin);
+
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
+        if (restaurantOpt.isPresent()) {
+            Restaurant restaurant = restaurantOpt.get();
+            model.addAttribute("restaurant", restaurant);
+            model.addAttribute("plats", platRepository.findByRestaurant(restaurant));
+            model.addAttribute("pageTitle", "Gérer le Menu de " + restaurant.getNom());
+            return "admin/admin_restaurant_menu";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Restaurant non trouvé.");
+            return "redirect:/admin_gestion_restaurant";
+        }
+    }
+
+    @GetMapping("/admin/restaurant/menu/{idRestaurant}/new")
+    public String showNewPlatFormAdmin(@PathVariable("idRestaurant") int idRestaurant, Model model,
+                                       HttpSession session, RedirectAttributes redirectAttributes) {
+        Admin admin = getAuthenticatedAdmin(session);
+        if (admin == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", admin);
+
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
+        if (restaurantOpt.isPresent()) {
+            model.addAttribute("restaurant", restaurantOpt.get());
+            model.addAttribute("plat", new Plat());
+            model.addAttribute("pageTitle", "Ajouter un nouveau plat au menu de " + restaurantOpt.get().getNom());
+            return "admin/admin_plat_form";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Restaurant non trouvé.");
+            return "redirect:/admin_gestion_restaurant";
+        }
+    }
+
+    @PostMapping("/admin/restaurant/menu/{idRestaurant}/save")
+    public String savePlatAdmin(@PathVariable("idRestaurant") int idRestaurant,
+                                @ModelAttribute("plat") Plat plat,
+                                RedirectAttributes redirectAttributes, HttpSession session) {
+        Admin admin = getAuthenticatedAdmin(session);
+        if (admin == null) {
+            return "redirect:/login";
+        }
+
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
+        if (restaurantOpt.isPresent()) {
+            Restaurant restaurant = restaurantOpt.get();
+            plat.setRestaurant(restaurant);
+            platRepository.save(plat);
+            redirectAttributes.addFlashAttribute("successMessage", "Plat sauvegardé avec succès !");
+            return "redirect:/admin/restaurant/menu/" + idRestaurant;
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Restaurant non trouvé pour sauvegarder le plat.");
+            return "redirect:/admin_gestion_restaurant";
+        }
+    }
+
+    @GetMapping("/admin/restaurant/menu/{idRestaurant}/edit/{idPlat}")
+    public String showEditPlatFormAdmin(@PathVariable("idRestaurant") int idRestaurant,
+                                        @PathVariable("idPlat") int idPlat,
+                                        Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        Admin admin = getAuthenticatedAdmin(session);
+        if (admin == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", admin);
+
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
+        Optional<Plat> platOptional = platRepository.findById(idPlat);
+
+        if (restaurantOpt.isPresent() && platOptional.isPresent()) {
+            Restaurant restaurant = restaurantOpt.get();
+            Plat plat = platOptional.get();
+
+            if (plat.getRestaurant().getIdRestaurant() != restaurant.getIdRestaurant()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Le plat ne correspond pas à ce restaurant.");
+                return "redirect:/admin/restaurant/menu/" + idRestaurant;
+            }
+
+            model.addAttribute("restaurant", restaurant);
+            model.addAttribute("plat", plat);
+            model.addAttribute("pageTitle", "Modifier le plat : " + plat.getNom());
+            return "admin/admin_plat_form";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Restaurant ou plat non trouvé.");
+            return "redirect:/admin/restaurant/menu/" + idRestaurant;
+        }
+    }
+
+    @PostMapping("/admin/restaurant/menu/{idRestaurant}/delete/{idPlat}")
+    public String deletePlatAdmin(@PathVariable("idRestaurant") int idRestaurant,
+                                  @PathVariable("idPlat") int idPlat,
+                                  RedirectAttributes redirectAttributes, HttpSession session) {
+        Admin admin = getAuthenticatedAdmin(session);
+        if (admin == null) {
+            return "redirect:/login";
+        }
+
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
+        Optional<Plat> platOptional = platRepository.findById(idPlat);
+
+        if (restaurantOpt.isPresent() && platOptional.isPresent()) {
+            Restaurant restaurant = restaurantOpt.get();
+            Plat plat = platOptional.get();
+
+            if (plat.getRestaurant().getIdRestaurant() != restaurant.getIdRestaurant()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Le plat ne correspond pas à ce restaurant.");
+                return "redirect:/admin/restaurant/menu/" + idRestaurant;
+            }
+
+            platRepository.delete(plat);
+            redirectAttributes.addFlashAttribute("successMessage", "Plat '" + plat.getNom() + "' supprimé avec succès !");
+            return "redirect:/admin/restaurant/menu/" + idRestaurant;
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Restaurant ou plat non trouvé pour la suppression.");
+            return "redirect:/admin/restaurant/menu/" + idRestaurant;
+        }
+    }
+
     @GetMapping("/admin/restaurant/logo/{idRestaurant}")
     public String showLogoRestaurantForm(@PathVariable("idRestaurant") int idRestaurant, Model model,
                                           HttpSession session, RedirectAttributes redirectAttributes) {
@@ -190,8 +327,11 @@ public class AdminController {
         }
     }
 
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
+
     @PostMapping("/admin/restaurant/logo/save")
     public String saveRestaurantLogo(@ModelAttribute("restaurant") Restaurant formRestaurant,
+                                     @RequestParam("logoFile") MultipartFile logoFile,
                                      RedirectAttributes redirectAttributes, HttpSession session) {
         Admin admin = getAuthenticatedAdmin(session);
         if (admin == null) {
@@ -201,9 +341,42 @@ public class AdminController {
         Optional<Restaurant> existingRestaurantOpt = restaurantRepository.findById(formRestaurant.getId());
         if (existingRestaurantOpt.isPresent()) {
             Restaurant dbRestaurant = existingRestaurantOpt.get();
-            dbRestaurant.setLogoUrl(formRestaurant.getLogoUrl());
+
+            if (!logoFile.isEmpty()) {
+                try {
+                    // Ensure the upload directory exists
+                    Path uploadPath = Paths.get(UPLOAD_DIR);
+                    if (!Files.exists(uploadPath)) {
+                        Files.createDirectories(uploadPath);
+                    }
+
+                    // Generate a unique file name to prevent conflicts
+                    String originalFilename = logoFile.getOriginalFilename();
+                    String fileExtension = "";
+                    if (originalFilename != null && originalFilename.contains(".")) {
+                        fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                    }
+                    String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+                    Path filePath = uploadPath.resolve(uniqueFileName);
+                    Files.copy(logoFile.getInputStream(), filePath);
+
+                    // Set the logo URL to the relative path for web access
+                    dbRestaurant.setLogoUrl("/uploads/" + uniqueFileName);
+                    redirectAttributes.addFlashAttribute("successMessage", "Logo du restaurant '" + dbRestaurant.getNom() + "' mis à jour !");
+
+                } catch (IOException e) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors du téléchargement du logo: " + e.getMessage());
+                    return "redirect:/admin/restaurant/logo/" + dbRestaurant.getIdRestaurant();
+                }
+            } else {
+                // If no new file is uploaded, keep the existing logoUrl or set to null if it was previously empty
+                // For now, we assume if no file is uploaded, the user doesn't want to change the logo.
+                // If you want to allow clearing the logo, you'd need a separate mechanism (e.g., a checkbox).
+                redirectAttributes.addFlashAttribute("errorMessage", "Aucun fichier sélectionné pour le logo.");
+                return "redirect:/admin/restaurant/logo/" + dbRestaurant.getIdRestaurant();
+            }
+
             restaurantRepository.save(dbRestaurant);
-            redirectAttributes.addFlashAttribute("successMessage", "Logo du restaurant '" + dbRestaurant.getNom() + "' mis à jour !");
             return "redirect:/admin_gestion_restaurant?idRestaurant=" + dbRestaurant.getIdRestaurant();
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Restaurant non trouvé pour la mise à jour du logo.");

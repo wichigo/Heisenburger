@@ -181,10 +181,13 @@
                 </table>
             </div>
              <div th:if="${#lists.isEmpty(selectedRestaurantMenu)}" class="alert alert-light">Ce restaurant n'a pas encore de menu.</div>
-        </div>
-        <div th:unless="${selectedRestaurant != null}" class="alert alert-secondary mt-3">
-            Sélectionnez un restaurant pour voir ses informations.
-        </div>
+             <div class="mt-3">
+                 <a th:href="@{/admin/restaurant/menu/{idRestaurant}(idRestaurant=${selectedRestaurant.idRestaurant})}" class="btn btn-primary">Gérer le Menu</a>
+             </div>
+         </div>
+         <div th:unless="${selectedRestaurant != null}" class="alert alert-secondary mt-3">
+             Sélectionnez un restaurant pour voir ses informations.
+         </div>
     </div>
 </main>
 
