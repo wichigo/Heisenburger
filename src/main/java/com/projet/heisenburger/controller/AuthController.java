@@ -37,7 +37,7 @@ public class AuthController {
 
     @GetMapping("/")
     public String home() {
-        return "home";
+        return "login";
     }
 
     @GetMapping("/login")

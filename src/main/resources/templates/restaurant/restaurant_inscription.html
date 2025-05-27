@@ -42,9 +42,6 @@
             left: 20px;
             z-index: 10; /* Pour s'assurer qu'il est cliquable */
         }
-        .top-left-logo-link img {
-            width: 80px; /* ou la taille souhaitée */
-        }
 
 
         .page-layout {
@@ -145,21 +142,19 @@
             margin-bottom: 1rem;
         }
         legend {
-            font-size: 1rem; /* Ajusté */
+            font-size: 1rem; 
             font-weight: 600;
             margin-bottom: 0.8rem;
-            /* border-bottom: 1px solid #eee; */ /* Optionnel, peut être retiré pour un look plus épuré */
-            /* padding-bottom: 0.5rem; */
+
         }
 
         .form-label {
-            font-size: 0.85rem; /* Ajusté */
+            font-size: 0.85rem;
             font-weight: 500;
             margin-bottom: 0.3rem;
         }
 
 
-        /* Responsive Design */
         @media (min-width: 992px) {
             .form-image-container {
                 display: block; 
@@ -167,10 +162,10 @@
         }
         @media (max-width: 991.98px) {
              .page-layout {
-                justify-content: center; /* Centrer le formulaire sur petits écrans */
+                justify-content: center; 
             }
             .form-container {
-                max-width: 90%; /* Utiliser plus de largeur sur petits écrans */
+                max-width: 90%; 
                 padding: 25px 30px;
             }
         }
@@ -191,10 +186,6 @@
     </style>
 </head>
 <body>
-
-    <a th:href="@{/}" class="top-left-logo-link">
-        <img src="/images/Heisenberg.svg" alt="Logo Heisenburger">
-    </a>
 
     <div class="top-right-button">
         <a th:href="@{/client_inscription}" class="btn btn-light">Espace Client</a>
