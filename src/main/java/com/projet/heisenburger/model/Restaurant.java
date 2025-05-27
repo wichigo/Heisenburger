@@ -22,7 +22,7 @@ public class Restaurant extends User {
     private String nom;
     private String description;
     private String adresse;
-    private int telephone;
+    private String telephone;
     @Column(name = "logo_url")
     private String logoUrl;
     private String statut;
@@ -42,7 +42,7 @@ public class Restaurant extends User {
         super();
     }
 
-    public Restaurant(String email, String password, String nom, String description, String adresse, int telephone, String logoUrl, String statut, LocalDateTime date_inscription, String horaires) {
+    public Restaurant(String email, String password, String nom, String description, String adresse, String telephone, String logoUrl, String statut, LocalDateTime date_inscription, String horaires) {
         super(email, password);
         this.nom = nom;
         this.description = description;
@@ -86,11 +86,11 @@ public class Restaurant extends User {
         this.adresse = adresse;
     }
 
-    public int getTelephone() {
+    public String getTelephone() {
         return telephone;
     }
 
-    public void setTelephone(int telephone) {
+    public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
 
