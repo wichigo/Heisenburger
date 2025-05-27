@@ -140,9 +140,9 @@ public class Restaurant extends User {
         return plats;
     }
 
-    // public void setPlats(List<Plat> plats) {
-    //     this.plats = plats;
-    // }
+    public void setPlats(List<Plat> plats) {
+        this.plats = plats;
+    }
 
     // // Méthodes utilitaires pour gérer la relation bidirectionnelle (bonne pratique)
     // public void addPlat(Plat plat) {

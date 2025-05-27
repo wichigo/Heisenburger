@@ -24,7 +24,7 @@ public class PlatController {
     private PlatRepository platRepository;
 
     // Méthode pour vérifier si l'utilisateur est un restaurant connecté
-    private Restaurant getAuthenticatedRestaurant(HttpSession session) {
+    protected Restaurant getAuthenticatedRestaurant(HttpSession session) {
         Object userAttribute = session.getAttribute("user");
         if (userAttribute instanceof Restaurant) {
             return (Restaurant) userAttribute;

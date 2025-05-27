@@ -31,8 +31,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Contrôleur Spring Boot pour la gestion des fonctionnalités administratives de l'application Heisenburger.
+ * Gère les opérations CRUD pour les restaurants et leurs menus (plats), ainsi que la gestion des logos
+ * des restaurants et l'affichage des commandes et clients.
+ */
 @Controller
 public class AdminController {
+
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     @Autowired
     private CommandeRepository commandeRepository;
@@ -43,7 +50,12 @@ public class AdminController {
     @Autowired
     private PlatRepository platRepository;
 
-    // Refactored authentication check
+    /**
+     * Vérifie si l'utilisateur connecté est un administrateur.
+     *
+     * @param session La session HTTP actuelle.
+     * @return L'objet Admin si l'utilisateur est un administrateur, sinon null.
+     */
     private Admin getAuthenticatedAdmin(HttpSession session) {
         Object userAttribute = session.getAttribute("user");
         if (userAttribute instanceof Admin) {
@@ -52,6 +64,16 @@ public class AdminController {
         return null;
     }
 
+    /**
+     * Affiche la page de gestion des restaurants pour l'administrateur.
+     * Permet de lister tous les restaurants et d'afficher les détails d'un restaurant sélectionné,
+     * y compris son menu.
+     *
+     * @param session La session HTTP.
+     * @param model Le modèle pour la vue.
+     * @param selectedRestaurantId L'ID du restaurant sélectionné (optionnel).
+     * @return Le nom de la vue "admin/admin_gestion_restaurant" ou une redirection vers la page de connexion.
+     */
     @GetMapping("/admin_gestion_restaurant")
     public String adminGestionRestaurant(HttpSession session, Model model,
                                          @RequestParam(name = "idRestaurant", required = false) Integer selectedRestaurantId) {
@@ -59,7 +81,7 @@ public class AdminController {
         if (admin == null) {
             return "redirect:/login";
         }
-        model.addAttribute("user", admin); // Add admin to model for the view
+        model.addAttribute("user", admin);
 
         List<Restaurant> allRestaurants = restaurantRepository.findAll();
         model.addAttribute("allRestaurants", allRestaurants);
@@ -81,6 +103,14 @@ public class AdminController {
         return "admin/admin_gestion_restaurant";
     }
 
+    /**
+     * Permet à l'administrateur de basculer le statut (actif/inactif) d'un restaurant.
+     *
+     * @param idRestaurant L'ID du restaurant à modifier.
+     * @param session La session HTTP.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @return Une redirection vers la page de gestion des restaurants.
+     */
     @PostMapping("/admin/restaurant/toggle-statut/{idRestaurant}")
     public String toggleRestaurantStatut(@PathVariable("idRestaurant") int idRestaurant,
                                          HttpSession session, RedirectAttributes redirectAttributes) {
@@ -105,6 +135,15 @@ public class AdminController {
         return "redirect:/admin_gestion_restaurant?idRestaurant=" + idRestaurant;
     }
 
+    /**
+     * Supprime un restaurant de la base de données.
+     * Gère les exceptions de violation d'intégrité des données si le restaurant est lié à des commandes.
+     *
+     * @param idRestaurant L'ID du restaurant à supprimer.
+     * @param session La session HTTP.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @return Une redirection vers la page de gestion des restaurants.
+     */
     @PostMapping("/admin/restaurant/supprimer/{idRestaurant}")
     public String supprimerRestaurant(@PathVariable("idRestaurant") int idRestaurant,
                                     HttpSession session, RedirectAttributes redirectAttributes) {
@@ -132,6 +171,15 @@ public class AdminController {
         return "redirect:/admin_gestion_restaurant";
     }
 
+    /**
+     * Affiche le formulaire de modification d'un restaurant existant.
+     *
+     * @param idRestaurant L'ID du restaurant à modifier.
+     * @param model Le modèle pour la vue.
+     * @param session La session HTTP.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @return Le nom de la vue "admin/admin_restaurant_form" ou une redirection.
+     */
     @GetMapping("/admin/restaurant/modifier/{idRestaurant}")
     public String showModifierRestaurantForm(@PathVariable("idRestaurant") int idRestaurant, Model model,
                                            HttpSession session, RedirectAttributes redirectAttributes) {
@@ -139,7 +187,7 @@ public class AdminController {
         if (admin == null) {
             return "redirect:/login";
         }
-        model.addAttribute("user", admin); // Add admin to model for the view (e.g. navbar)
+        model.addAttribute("user", admin);
 
         Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
         if (restaurantOpt.isPresent()) {
@@ -152,6 +200,14 @@ public class AdminController {
         }
     }
 
+    /**
+     * Sauvegarde les modifications apportées à un restaurant.
+     *
+     * @param formRestaurant L'objet Restaurant avec les données du formulaire.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @param session La session HTTP.
+     * @return Une redirection vers la page de gestion des restaurants.
+     */
     @PostMapping("/admin/restaurant/save")
     public String saveModifiedRestaurant(@ModelAttribute("restaurant") Restaurant formRestaurant,
                                          RedirectAttributes redirectAttributes, HttpSession session) {
@@ -180,6 +236,15 @@ public class AdminController {
         return "redirect:/admin_gestion_restaurant";
     }
 
+    /**
+     * Affiche la page de gestion du menu d'un restaurant spécifique.
+     *
+     * @param idRestaurant L'ID du restaurant dont on veut gérer le menu.
+     * @param model Le modèle pour la vue.
+     * @param session La session HTTP.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @return Le nom de la vue "admin/admin_restaurant_menu" ou une redirection.
+     */
     @GetMapping("/admin/restaurant/menu/{idRestaurant}")
     public String showRestaurantMenu(@PathVariable("idRestaurant") int idRestaurant, Model model,
                                      HttpSession session, RedirectAttributes redirectAttributes) {
@@ -202,6 +267,15 @@ public class AdminController {
         }
     }
 
+    /**
+     * Affiche le formulaire pour ajouter un nouveau plat au menu d'un restaurant.
+     *
+     * @param idRestaurant L'ID du restaurant auquel ajouter le plat.
+     * @param model Le modèle pour la vue.
+     * @param session La session HTTP.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @return Le nom de la vue "admin/admin_plat_form" ou une redirection.
+     */
     @GetMapping("/admin/restaurant/menu/{idRestaurant}/new")
     public String showNewPlatFormAdmin(@PathVariable("idRestaurant") int idRestaurant, Model model,
                                        HttpSession session, RedirectAttributes redirectAttributes) {
@@ -223,6 +297,15 @@ public class AdminController {
         }
     }
 
+    /**
+     * Sauvegarde un nouveau plat ou met à jour un plat existant pour un restaurant.
+     *
+     * @param idRestaurant L'ID du restaurant concerné.
+     * @param plat L'objet Plat avec les données du formulaire.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @param session La session HTTP.
+     * @return Une redirection vers la page de gestion du menu du restaurant.
+     */
     @PostMapping("/admin/restaurant/menu/{idRestaurant}/save")
     public String savePlatAdmin(@PathVariable("idRestaurant") int idRestaurant,
                                 @ModelAttribute("plat") Plat plat,
@@ -245,6 +328,16 @@ public class AdminController {
         }
     }
 
+    /**
+     * Affiche le formulaire pour modifier un plat existant du menu d'un restaurant.
+     *
+     * @param idRestaurant L'ID du restaurant concerné.
+     * @param idPlat L'ID du plat à modifier.
+     * @param model Le modèle pour la vue.
+     * @param session La session HTTP.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @return Le nom de la vue "admin/admin_plat_form" ou une redirection.
+     */
     @GetMapping("/admin/restaurant/menu/{idRestaurant}/edit/{idPlat}")
     public String showEditPlatFormAdmin(@PathVariable("idRestaurant") int idRestaurant,
                                         @PathVariable("idPlat") int idPlat,
@@ -277,6 +370,15 @@ public class AdminController {
         }
     }
 
+    /**
+     * Supprime un plat du menu d'un restaurant.
+     *
+     * @param idRestaurant L'ID du restaurant concerné.
+     * @param idPlat L'ID du plat à supprimer.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @param session La session HTTP.
+     * @return Une redirection vers la page de gestion du menu du restaurant.
+     */
     @PostMapping("/admin/restaurant/menu/{idRestaurant}/delete/{idPlat}")
     public String deletePlatAdmin(@PathVariable("idRestaurant") int idRestaurant,
                                   @PathVariable("idPlat") int idPlat,
@@ -307,6 +409,15 @@ public class AdminController {
         }
     }
 
+    /**
+     * Affiche le formulaire pour modifier le logo d'un restaurant.
+     *
+     * @param idRestaurant L'ID du restaurant dont on veut modifier le logo.
+     * @param model Le modèle pour la vue.
+     * @param session La session HTTP.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @return Le nom de la vue "admin/admin_restaurant_logo" ou une redirection.
+     */
     @GetMapping("/admin/restaurant/logo/{idRestaurant}")
     public String showLogoRestaurantForm(@PathVariable("idRestaurant") int idRestaurant, Model model,
                                           HttpSession session, RedirectAttributes redirectAttributes) {
@@ -314,7 +425,7 @@ public class AdminController {
         if (admin == null) {
             return "redirect:/login";
         }
-        model.addAttribute("user", admin); // Add admin to model for the view
+        model.addAttribute("user", admin);
 
         Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
         if (restaurantOpt.isPresent()) {
@@ -327,8 +438,15 @@ public class AdminController {
         }
     }
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
-
+    /**
+     * Sauvegarde le logo téléchargé pour un restaurant.
+     *
+     * @param formRestaurant L'objet Restaurant (contient l'ID).
+     * @param logoFile Le fichier image du logo téléchargé.
+     * @param redirectAttributes Les attributs de redirection pour les messages flash.
+     * @param session La session HTTP.
+     * @return Une redirection vers la page de gestion des restaurants.
+     */
     @PostMapping("/admin/restaurant/logo/save")
     public String saveRestaurantLogo(@ModelAttribute("restaurant") Restaurant formRestaurant,
                                      @RequestParam("logoFile") MultipartFile logoFile,
@@ -344,13 +462,11 @@ public class AdminController {
 
             if (!logoFile.isEmpty()) {
                 try {
-                    // Ensure the upload directory exists
                     Path uploadPath = Paths.get(UPLOAD_DIR);
                     if (!Files.exists(uploadPath)) {
                         Files.createDirectories(uploadPath);
                     }
 
-                    // Generate a unique file name to prevent conflicts
                     String originalFilename = logoFile.getOriginalFilename();
                     String fileExtension = "";
                     if (originalFilename != null && originalFilename.contains(".")) {
@@ -360,7 +476,6 @@ public class AdminController {
                     Path filePath = uploadPath.resolve(uniqueFileName);
                     Files.copy(logoFile.getInputStream(), filePath);
 
-                    // Set the logo URL to the relative path for web access
                     dbRestaurant.setLogoUrl("/uploads/" + uniqueFileName);
                     redirectAttributes.addFlashAttribute("successMessage", "Logo du restaurant '" + dbRestaurant.getNom() + "' mis à jour !");
 
@@ -369,9 +484,6 @@ public class AdminController {
                     return "redirect:/admin/restaurant/logo/" + dbRestaurant.getIdRestaurant();
                 }
             } else {
-                // If no new file is uploaded, keep the existing logoUrl or set to null if it was previously empty
-                // For now, we assume if no file is uploaded, the user doesn't want to change the logo.
-                // If you want to allow clearing the logo, you'd need a separate mechanism (e.g., a checkbox).
                 redirectAttributes.addFlashAttribute("errorMessage", "Aucun fichier sélectionné pour le logo.");
                 return "redirect:/admin/restaurant/logo/" + dbRestaurant.getIdRestaurant();
             }
@@ -384,10 +496,20 @@ public class AdminController {
         return "redirect:/admin_gestion_restaurant";
     }
 
+    /**
+     * Affiche la page de gestion des clients pour l'administrateur.
+     * Permet de filtrer les commandes par statut.
+     *
+     * @param session La session HTTP.
+     * @param model Le modèle pour la vue.
+     * @param idClientParam L'ID du client (non utilisé actuellement, mais conservé pour la cohérence).
+     * @param statutCommandeParam Le statut de la commande pour le filtrage (optionnel).
+     * @return Le nom de la vue "admin/admin_gestion_client" ou une redirection.
+     */
     @GetMapping("/admin_gestion_client")
     public String adminClient(HttpSession session, Model model,
-                                @RequestParam(name = "idClient", required = false) String idClientParam, // Renamed for clarity
-                                @RequestParam(name = "statutCommande", required = false) String statutCommandeParam) { // Added statutCommande
+                                @RequestParam(name = "idClient", required = false) String idClientParam,
+                                @RequestParam(name = "statutCommande", required = false) String statutCommandeParam) {
         Admin admin = getAuthenticatedAdmin(session);
         if (admin == null) {
             return "redirect:/login";
@@ -410,7 +532,13 @@ public class AdminController {
         return "admin/admin_gestion_client";
     }
 
-
+    /**
+     * Affiche la page de gestion des commandes pour l'administrateur.
+     *
+     * @param session La session HTTP.
+     * @param model Le modèle pour la vue.
+     * @return Le nom de la vue "admin/admin_gestion_commande" ou une redirection.
+     */
     @GetMapping("/admin_gestion_commande")
     public String adminGestionCommande(HttpSession session, Model model){
         Admin admin = getAuthenticatedAdmin(session);
@@ -421,6 +549,13 @@ public class AdminController {
         return "admin/admin_gestion_commande";
     }
 
+    /**
+     * Affiche la page de profil de l'administrateur.
+     *
+     * @param session La session HTTP.
+     * @param model Le modèle pour la vue.
+     * @return Le nom de la vue "admin/admin_profil" ou une redirection.
+     */
     @GetMapping("/admin_profil")
     public String adminProfil(HttpSession session, Model model){
         Admin admin = getAuthenticatedAdmin(session);
@@ -431,6 +566,17 @@ public class AdminController {
         return "admin/admin_profil";
     }
 
+    /**
+     * Affiche le tableau de bord de l'administrateur.
+     * Permet de filtrer les restaurants par code postal et statut, et les commandes par statut.
+     *
+     * @param session La session HTTP.
+     * @param model Le modèle pour la vue.
+     * @param codePostal Le code postal pour filtrer les restaurants (optionnel).
+     * @param statutRestaurantParam Le statut du restaurant pour le filtrage (optionnel, par défaut "actif").
+     * @param statutCommandeParam Le statut de la commande pour le filtrage (optionnel, par défaut "en_livraison").
+     * @return Le nom de la vue "admin/admin_dashboard" ou une redirection.
+     */
     @GetMapping("/admin/dashboard")
     public String adminDashboard(HttpSession session, Model model,
                                 @RequestParam(name = "codePostal", required = false) String codePostal,
@@ -450,7 +596,7 @@ public class AdminController {
                     .filter(r -> r.getStatut() != null && statutToCompareCmd.equals(r.getStatut().toUpperCase()))
                     .collect(Collectors.toList());
         } else {
-            filteredCommandes = allCommandes; // Or an empty list if "Tous statuts" means no filter initially
+            filteredCommandes = allCommandes;
         }
         model.addAttribute("commandes", filteredCommandes);
         model.addAttribute("currentStatutCommande", statutCommandeParam);
@@ -469,7 +615,7 @@ public class AdminController {
                     .collect(Collectors.toList());
 
         } else {
-            filteredRestaurants = restaurantsFromDB; 
+            filteredRestaurants = restaurantsFromDB;
         }
         model.addAttribute("restaurants", filteredRestaurants);
         model.addAttribute("currentCodePostal", codePostal);

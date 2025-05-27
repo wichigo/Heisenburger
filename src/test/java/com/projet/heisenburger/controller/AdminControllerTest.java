@@ -2,9 +2,10 @@ package com.projet.heisenburger.controller;
 
 import com.projet.heisenburger.model.Admin;
 import com.projet.heisenburger.model.Commande;
-import com.projet.heisenburger.model.Restaurant;
 import com.projet.heisenburger.model.Plat;
+import com.projet.heisenburger.model.Restaurant;
 import com.projet.heisenburger.repository.CommandeRepository;
+import com.projet.heisenburger.repository.PlatRepository;
 import com.projet.heisenburger.repository.RestaurantRepository;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.MockedStatic; 
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +42,9 @@ public class AdminControllerTest {
     private RestaurantRepository restaurantRepository;
 
     @Mock
+    private PlatRepository platRepository;
+
+    @Mock
     private HttpSession session;
 
     @Mock
@@ -50,10 +59,9 @@ public class AdminControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         testAdmin = new Admin("admin@example.com", "adminpass", "ADMIN", "Test", "Admin");
-        testAdmin.setId(1); // Set an ID for the admin
+        testAdmin.setId(1);
     }
 
-    // Helper method to set up the session with an authenticated admin
     private void setupAuthenticatedAdmin() {
         when(session.getAttribute("user")).thenReturn(testAdmin);
     }
@@ -90,7 +98,7 @@ public class AdminControllerTest {
         restaurant.setNom("Test Restaurant");
         restaurant.setPlats(Arrays.asList(new Plat(), new Plat()));
         when(restaurantRepository.findByIdRestaurant(1)).thenReturn(Optional.of(restaurant));
-        when(restaurantRepository.findAll()).thenReturn(Collections.emptyList()); // Mock findAll as well
+        when(restaurantRepository.findAll()).thenReturn(Collections.emptyList());
 
         String viewName = adminController.adminGestionRestaurant(session, model, 1);
 
@@ -195,7 +203,7 @@ public class AdminControllerTest {
 
         Restaurant existingRestaurant = new Restaurant();
         existingRestaurant.setId(1);
-        existingRestaurant.setIdRestaurant(100); // Simulate a different idRestaurant
+        existingRestaurant.setIdRestaurant(100);
 
         when(restaurantRepository.findById(1)).thenReturn(Optional.of(existingRestaurant));
 
@@ -235,7 +243,7 @@ public class AdminControllerTest {
 
         String viewName = adminController.showLogoRestaurantForm(1, model, session, redirectAttributes);
 
-        assertEquals("admin/admin_restaurant_logo_form", viewName);
+        assertEquals("admin/admin_restaurant_logo", viewName);
         verify(model).addAttribute("user", testAdmin);
         verify(model).addAttribute("restaurant", restaurant);
         verify(model).addAttribute(eq("pageTitle"), anyString());
@@ -253,36 +261,238 @@ public class AdminControllerTest {
     }
 
     @Test
-    void saveRestaurantLogo_authenticatedAdmin_savesLogoAndRedirects() {
+    void saveRestaurantLogo_authenticatedAdmin_savesLogoAndRedirects() throws IOException {
         setupAuthenticatedAdmin();
         Restaurant formRestaurant = new Restaurant();
         formRestaurant.setId(1);
-        formRestaurant.setLogoUrl("new_logo.png");
 
         Restaurant existingRestaurant = new Restaurant();
         existingRestaurant.setId(1);
         existingRestaurant.setIdRestaurant(100);
         existingRestaurant.setNom("Test Restaurant");
 
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "logoFile",
+                "test-logo.png",
+                "image/png",
+                "test image content".getBytes()
+        );
+
+        try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
+            mockedFiles.when(() -> Files.exists(any(Path.class))).thenReturn(false);
+            mockedFiles.when(() -> Files.createDirectories(any(Path.class))).thenReturn(null);
+            mockedFiles.when(() -> Files.copy(any(java.io.InputStream.class), any(Path.class))).thenReturn(1L);
+
+            when(restaurantRepository.findById(1)).thenReturn(Optional.of(existingRestaurant));
+
+            String viewName = adminController.saveRestaurantLogo(formRestaurant, mockFile, redirectAttributes, session);
+
+            assertEquals("redirect:/admin_gestion_restaurant?idRestaurant=100", viewName);
+            assertNotNull(existingRestaurant.getLogoUrl());
+            verify(restaurantRepository).save(existingRestaurant);
+            verify(redirectAttributes).addFlashAttribute(eq("successMessage"), anyString());
+            mockedFiles.verify(() -> Files.exists(any(Path.class)));
+            mockedFiles.verify(() -> Files.createDirectories(any(Path.class)));
+            mockedFiles.verify(() -> Files.copy(any(java.io.InputStream.class), any(Path.class)));
+        }
+    }
+
+    @Test
+    void saveRestaurantLogo_authenticatedAdmin_noFileUploaded() throws IOException {
+        setupAuthenticatedAdmin();
+        Restaurant formRestaurant = new Restaurant();
+        formRestaurant.setId(1);
+
+        Restaurant existingRestaurant = new Restaurant();
+        existingRestaurant.setId(1);
+        existingRestaurant.setIdRestaurant(100);
+        existingRestaurant.setNom("Test Restaurant");
+        existingRestaurant.setLogoUrl("/existing/logo.png");
+
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "logoFile",
+                "",
+                "image/png",
+                new byte[0]
+        );
+
         when(restaurantRepository.findById(1)).thenReturn(Optional.of(existingRestaurant));
 
-        String viewName = adminController.saveRestaurantLogo(formRestaurant, redirectAttributes, session);
+        String viewName = adminController.saveRestaurantLogo(formRestaurant, emptyFile, redirectAttributes, session);
 
-        assertEquals("redirect:/admin_gestion_restaurant?idRestaurant=100", viewName);
-        assertEquals("new_logo.png", existingRestaurant.getLogoUrl());
-        verify(restaurantRepository).save(existingRestaurant);
+        assertEquals("redirect:/admin/restaurant/logo/100", viewName);
+        verify(redirectAttributes).addFlashAttribute(eq("errorMessage"), anyString());
+        verify(restaurantRepository, never()).save(any(Restaurant.class));
+    }
+
+    @Test
+    void saveRestaurantLogo_unauthenticatedAdmin_redirectsToLogin() throws IOException {
+        when(session.getAttribute("user")).thenReturn(null);
+        Restaurant formRestaurant = new Restaurant();
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "logoFile",
+                "",
+                "image/png",
+                new byte[0]
+        );
+
+        String viewName = adminController.saveRestaurantLogo(formRestaurant, emptyFile, redirectAttributes, session);
+
+        assertEquals("redirect:/login", viewName);
+        verifyNoInteractions(restaurantRepository);
+        verifyNoInteractions(redirectAttributes);
+    }
+
+    @Test
+    void showRestaurantMenu_authenticatedAdmin_returnsViewAndAddsAttributes() {
+        setupAuthenticatedAdmin();
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdRestaurant(1);
+        restaurant.setNom("Test Restaurant");
+        List<Plat> plats = Arrays.asList(new Plat(), new Plat());
+        when(restaurantRepository.findByIdRestaurant(1)).thenReturn(Optional.of(restaurant));
+        when(platRepository.findByRestaurant(restaurant)).thenReturn(plats);
+
+        String viewName = adminController.showRestaurantMenu(1, model, session, redirectAttributes);
+
+        assertEquals("admin/admin_restaurant_menu", viewName);
+        verify(model).addAttribute("user", testAdmin);
+        verify(model).addAttribute("restaurant", restaurant);
+        verify(model).addAttribute("plats", plats);
+        verify(model).addAttribute(eq("pageTitle"), anyString());
+    }
+
+    @Test
+    void showRestaurantMenu_unauthenticatedAdmin_redirectsToLogin() {
+        when(session.getAttribute("user")).thenReturn(null);
+
+        String viewName = adminController.showRestaurantMenu(1, model, session, redirectAttributes);
+
+        assertEquals("redirect:/login", viewName);
+        verifyNoInteractions(model);
+        verifyNoInteractions(redirectAttributes);
+    }
+
+    @Test
+    void showNewPlatFormAdmin_authenticatedAdmin_returnsViewAndAddsAttributes() {
+        setupAuthenticatedAdmin();
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdRestaurant(1);
+        restaurant.setNom("Test Restaurant");
+        when(restaurantRepository.findByIdRestaurant(1)).thenReturn(Optional.of(restaurant));
+
+        String viewName = adminController.showNewPlatFormAdmin(1, model, session, redirectAttributes);
+
+        assertEquals("admin/admin_plat_form", viewName);
+        verify(model).addAttribute("user", testAdmin);
+        verify(model).addAttribute("restaurant", restaurant);
+        verify(model).addAttribute(eq("plat"), any(Plat.class));
+        verify(model).addAttribute(eq("pageTitle"), anyString());
+    }
+
+    @Test
+    void showNewPlatFormAdmin_unauthenticatedAdmin_redirectsToLogin() {
+        when(session.getAttribute("user")).thenReturn(null);
+
+        String viewName = adminController.showNewPlatFormAdmin(1, model, session, redirectAttributes);
+
+        assertEquals("redirect:/login", viewName);
+        verifyNoInteractions(model);
+        verifyNoInteractions(redirectAttributes);
+    }
+
+    @Test
+    void savePlatAdmin_authenticatedAdmin_savesPlatAndRedirects() {
+        setupAuthenticatedAdmin();
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdRestaurant(1);
+        Plat plat = mock(Plat.class);
+        when(plat.getNom()).thenReturn("New Plat"); 
+
+        when(restaurantRepository.findByIdRestaurant(1)).thenReturn(Optional.of(restaurant));
+
+        String viewName = adminController.savePlatAdmin(1, plat, redirectAttributes, session);
+
+        assertEquals("redirect:/admin/restaurant/menu/1", viewName);
+        verify(plat).setRestaurant(restaurant);
+        verify(platRepository).save(plat);
         verify(redirectAttributes).addFlashAttribute(eq("successMessage"), anyString());
     }
 
     @Test
-    void saveRestaurantLogo_unauthenticatedAdmin_redirectsToLogin() {
+    void savePlatAdmin_unauthenticatedAdmin_redirectsToLogin() {
         when(session.getAttribute("user")).thenReturn(null);
-        Restaurant formRestaurant = new Restaurant();
+        Plat plat = new Plat();
 
-        String viewName = adminController.saveRestaurantLogo(formRestaurant, redirectAttributes, session);
+        String viewName = adminController.savePlatAdmin(1, plat, redirectAttributes, session);
 
         assertEquals("redirect:/login", viewName);
-        verifyNoInteractions(restaurantRepository);
+        verifyNoInteractions(platRepository);
+        verifyNoInteractions(redirectAttributes);
+    }
+
+    @Test
+    void showEditPlatFormAdmin_authenticatedAdmin_returnsViewAndAddsAttributes() {
+        setupAuthenticatedAdmin();
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdRestaurant(1);
+        restaurant.setNom("Test Restaurant");
+        Plat plat = new Plat();
+        plat.setId(10);
+        plat.setNom("Existing Plat");
+        plat.setRestaurant(restaurant);
+
+        when(restaurantRepository.findByIdRestaurant(1)).thenReturn(Optional.of(restaurant));
+        when(platRepository.findById(10)).thenReturn(Optional.of(plat));
+
+        String viewName = adminController.showEditPlatFormAdmin(1, 10, model, session, redirectAttributes);
+
+        assertEquals("admin/admin_plat_form", viewName);
+        verify(model).addAttribute("user", testAdmin);
+        verify(model).addAttribute("restaurant", restaurant);
+        verify(model).addAttribute("plat", plat);
+        verify(model).addAttribute(eq("pageTitle"), anyString());
+    }
+
+    @Test
+    void showEditPlatFormAdmin_unauthenticatedAdmin_redirectsToLogin() {
+        when(session.getAttribute("user")).thenReturn(null);
+
+        String viewName = adminController.showEditPlatFormAdmin(1, 10, model, session, redirectAttributes);
+
+        assertEquals("redirect:/login", viewName);
+        verifyNoInteractions(model);
+        verifyNoInteractions(redirectAttributes);
+    }
+
+    @Test
+    void deletePlatAdmin_authenticatedAdmin_deletesPlatAndRedirects() {
+        setupAuthenticatedAdmin();
+        Restaurant restaurant = new Restaurant();
+        restaurant.setIdRestaurant(1);
+        Plat plat = new Plat();
+        plat.setId(10);
+        plat.setNom("Plat to Delete");
+        plat.setRestaurant(restaurant);
+
+        when(restaurantRepository.findByIdRestaurant(1)).thenReturn(Optional.of(restaurant));
+        when(platRepository.findById(10)).thenReturn(Optional.of(plat));
+
+        String viewName = adminController.deletePlatAdmin(1, 10, redirectAttributes, session);
+
+        assertEquals("redirect:/admin/restaurant/menu/1", viewName);
+        verify(platRepository).delete(plat);
+        verify(redirectAttributes).addFlashAttribute(eq("successMessage"), anyString());
+    }
+
+    @Test
+    void deletePlatAdmin_unauthenticatedAdmin_redirectsToLogin() {
+        when(session.getAttribute("user")).thenReturn(null);
+
+        String viewName = adminController.deletePlatAdmin(1, 10, redirectAttributes, session);
+
+        assertEquals("redirect:/login", viewName);
+        verifyNoInteractions(platRepository);
         verifyNoInteractions(redirectAttributes);
     }
 
