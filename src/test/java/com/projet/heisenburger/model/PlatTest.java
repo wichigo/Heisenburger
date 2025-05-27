@@ -32,7 +32,6 @@ public class PlatTest {
         Restaurant restaurant = new Restaurant();
         restaurant.setId(10);
         plat.setRestaurant(restaurant);
-        plat.setCategorie("Plat Principal");
 
         assertEquals(1, plat.getId());
         assertEquals("Burger Classique", plat.getNom());
@@ -57,7 +56,6 @@ public class PlatTest {
         Restaurant restaurant = new Restaurant();
         restaurant.setId(10);
         plat.setRestaurant(restaurant);
-        plat.setCategorie("Plat Principal");
 
         String expectedToString = "Plat{id=1, nom='Burger Classique', description='Un délicieux burger avec du fromage et des frites.', prix=12.5, imageUrl='http://example.com/burger.jpg', disponible='oui', restaurant=" + restaurant.toString() + ", categorie='Plat Principal'}";
         assertEquals(expectedToString, plat.toString());

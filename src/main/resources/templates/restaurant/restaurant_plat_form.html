@@ -1,71 +1,197 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle ?: 'Formulaire Plat'}">Formulaire Plat</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(to bottom right, #e70b03, #e6870b);
+            --card-shadow-fade: 0 4px 50px rgba(230, 135, 11, 0.3);
+            --text-dark: #333;
+            --text-light: #f1f1f1;
+            --primary-color: #e70b03;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            --card-border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--primary-gradient);
+            padding-top: 80px;
+        }
+        .navbar { /* Style Glassmorphism */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: var(--card-border);
+            box-shadow: var(--card-shadow);
+        }
+        .navbar-brand img { max-height: 40px; }
+        .navbar .nav-link, .navbar .navbar-text, .navbar-brand span, .navbar-brand {
+            color: var(--text-light) !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+         .navbar .btn-outline-light {
+            color: var(--text-light) !important;
+            border-color: rgba(255,255,255,0.5);
+        }
+        .navbar .btn-outline-light:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .form-container-card {
+            background: #ffffff;
+            color: var(--text-dark);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow-fade);
+            padding: 30px 40px;
+            width: 100%;
+            max-width: 800px; /* Largeur pour le formulaire */
+            margin: 2rem auto; /* Centrer la carte et ajouter une marge en haut/bas */
+        }
+        .form-container-card h1 {
+            color: var(--text-dark);
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.75rem;
+        }
+        .btn-save {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        .btn-save:hover {
+            background-color: #c40a03;
+            border-color: #c40a03;
+        }
+        /* Conteneur pour les messages flash (si nécessaire directement sur cette page) */
+        .alert-container { 
+            position: fixed; 
+            top: 80px; /* Sous la navbar */
+            width: 50%; 
+            left: 25%; 
+            z-index: 1050; 
+        }
+
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h2 th:text="${pageTitle ?: 'Gestion de Plat'}">Gestion de Plat</h2>
 
-    <form th:action="@{/restaurant/plats/save}" th:object="${plat}" method="post" class="needs-validation" novalidate>
-        <input type="hidden" th:field="*{id}"/>
-
-        <div class="form-group">
-            <label for="nom">Nom du plat:</label>
-            <input type="text" th:field="*{nom}" class="form-control" id="nom" placeholder="Ex: Pizza Margherita" required/>
-            <div class="invalid-feedback">Le nom du plat est requis.</div>
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/restaurant/dashboard}">
+            <img src="/images/Heisenberg.svg" alt="Heisenburger Logo">
+            <span th:if="${session.user?.nom}" th:text="${session.user.nom}" class="ms-2"></span>
+            <span th:unless="${session.user?.nom}" th:text="${session.user?.email}" class="ms-2"></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#restaurantNavbar"
+                aria-controls="restaurantNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon" style="filter: invert(1) brightness(2);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="restaurantNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/restaurant/dashboard}"><i class="bi bi-speedometer2"></i> Tableau de Bord</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/restaurant/plats}"><i class="bi bi-card-list"></i> Mes Plats</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/logout}" class="btn btn-sm btn-outline-light ms-lg-2">
+                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    </a>
+                </li>
+            </ul>
         </div>
+    </div>
+</nav>
 
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea th:field="*{description}" class="form-control" id="description" rows="3" placeholder="Ex: Sauce tomate, mozzarella, basilic"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="prix">Prix (€):</label>
-            <input type="number" step="0.01" th:field="*{prix}" class="form-control" id="prix" placeholder="Ex: 12.50" required/>
-            <div class="invalid-feedback">Le prix est requis et doit être un nombre valide.</div>
-        </div>
-
-        <div class="form-group">
-            <label for="disponible">Disponible:</label>
-            <select th:field="*{disponible}" class="form-control" id="disponible">
-                <option th:value="true">Oui</option>
-                <option th:value="false">Non</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="imageUrl">URL de l'image:</label>
-            <input type="text" th:field="*{imageUrl}" class="form-control" id="imageUrl" placeholder="Ex: https://example.com/image.jpg"/>
-            <small class="form-text text-muted">Laissez vide si pas d'image.</small>
-        </div>
-
-        <button type="submit" class="btn btn-success">Enregistrer le plat</button>
-        <a th:href="@{/restaurant/plats}" class="btn btn-secondary">Annuler et retourner à la liste</a>
-    </form>
+<div class="alert-container">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 </div>
 
-<script>
-// Script pour la validation Bootstrap (optionnel mais recommandé)
-(function() {
-  'use strict';
-  window.addEventListener('load', function() {
-    var forms = document.getElementsByClassName('needs-validation');
-    var validation = Array.prototype.filter.call(forms, function(form) {
-      form.addEventListener('submit', function(event) {
-        if (form.checkValidity() === false) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  }, false);
-})();
-</script>
+
+<div class="container">
+    <div class="form-container-card">
+        <h1 th:text="${pageTitle ?: 'Gestion de Plat'}"><i class="bi bi-egg-fried"></i> Gestion de Plat</h1>
+
+        <form th:action="@{/restaurant/plats/save}" th:object="${plat}" method="post" class="needs-validation" novalidate>
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom du plat <span class="text-danger">*</span></label>
+                <input type="text" th:field="*{nom}" class="form-control form-control-lg" id="nom" placeholder="Ex: Burger Classique Maison" required/>
+                <div class="invalid-feedback">Le nom du plat est requis.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description détaillée</label>
+                <textarea th:field="*{description}" class="form-control" id="description" rows="4" placeholder="Décrivez votre plat, ses ingrédients principaux, etc."></textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="prix" class="form-label">Prix (€) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text">€</span>
+                        <input type="number" step="0.01" th:field="*{prix}" class="form-control form-control-lg" id="prix" placeholder="12.50" required/>
+                    </div>
+                    <div class="invalid-feedback">Le prix est requis et doit être un nombre valide.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="categorie" class="form-label">Catégorie <span class="text-danger">*</span></label>
+                    <select class="form-select form-select-lg" id="categorie" th:field="*{categorie}" required>
+                        <option value="">-- Choisir une catégorie --</option>
+                        <option th:each="cat : ${allCategories}"
+                                th:value="${cat.id}"
+                                th:text="${cat.nom}"
+                                th:selected="${plat.categorie != null && plat.categorie.id == cat.id}"></option>
+                    </select>
+                    <div class="invalid-feedback">La catégorie est requise.</div>
+                    <div th:if="${#fields.hasErrors('categorie')}" th:errors="*{categorie}" class="text-danger small mt-1"></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="imageUrl" class="form-label">URL de l'image du plat</label>
+                <input type="url" th:field="*{imageUrl}" class="form-control" id="imageUrl" placeholder="https://exemple.com/image-de-mon-plat.jpg"/>
+                <small class="form-text text-muted">Un lien direct vers une image hébergée (jpg, png).</small>
+            </div>
+
+            <div class="mb-4 form-check form-switch">
+                <input type="checkbox" class="form-check-input" role="switch" id="disponible" name="disponible" value="true" th:checked="${#strings.equals(plat.disponible, 'true') || plat.disponible == true || (plat.disponible == null && true)}"/> <input type="hidden" name="_disponible" value="on"/> 
+                <label class="form-check-label" for="disponible">Plat disponible à la vente</label>
+            </div>
+            
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-end">
+                <a th:href="@{/restaurant/plats}" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-x-circle"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-save text-white">
+                    <i class="bi bi-check-circle-fill"></i> Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 </body>
 </html>

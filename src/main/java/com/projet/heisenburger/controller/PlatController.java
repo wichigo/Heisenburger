@@ -1,8 +1,10 @@
 package com.projet.heisenburger.controller;
 
+import com.projet.heisenburger.model.Categorie;
 import com.projet.heisenburger.model.Plat;
 import com.projet.heisenburger.model.Restaurant;
 import com.projet.heisenburger.repository.PlatRepository; 
+import com.projet.heisenburger.repository.CategorieRepository;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/restaurant/plats") 
 public class PlatController {
+
+    @Autowired
+    private CategorieRepository categorieRepository;
 
     @Autowired
     private PlatRepository platRepository;
@@ -53,10 +58,11 @@ public class PlatController {
         if (restaurant == null) {
             return "redirect:/login";
         }
-
-        model.addAttribute("plat", new Plat()); 
+        model.addAttribute("plat", new Plat());
+        List<Categorie> categories = categorieRepository.findAll(); // Charger les catégories
+        model.addAttribute("allCategories", categories);            // Les ajouter au modèle
         model.addAttribute("pageTitle", "Ajouter un nouveau plat");
-        return "restaurant/restaurant_plat_form"; // Vue du formulaire [cite: 66]
+        return "restaurant/restaurant_plat_form";
     }
 
     @PostMapping("/save")
@@ -77,7 +83,7 @@ public class PlatController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditPlatForm(@PathVariable("id") int id, 
+    public String showEditPlatForm(@PathVariable("id") int id,
                                    HttpSession session,
                                    Model model,
                                    RedirectAttributes redirectAttributes) {
@@ -94,8 +100,10 @@ public class PlatController {
                 return "redirect:/restaurant/plats";
             }
             model.addAttribute("plat", plat);
+            List<Categorie> categories = categorieRepository.findAll(); // Charger les catégories
+            model.addAttribute("allCategories", categories);            // Les ajouter au modèle
             model.addAttribute("pageTitle", "Modifier le plat : " + plat.getNom());
-            return "restaurant/restaurant_plat_form"; 
+            return "restaurant/restaurant_plat_form";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Plat non trouvé.");
             return "redirect:/restaurant/plats";

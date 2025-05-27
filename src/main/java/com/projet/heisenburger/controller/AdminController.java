@@ -1,9 +1,11 @@
 package com.projet.heisenburger.controller;
 
 import com.projet.heisenburger.model.Admin;
+import com.projet.heisenburger.model.Categorie;
 import com.projet.heisenburger.model.Commande;
 import com.projet.heisenburger.model.Plat;
 import com.projet.heisenburger.model.Restaurant;
+import com.projet.heisenburger.repository.CategorieRepository;
 import com.projet.heisenburger.repository.CommandeRepository;
 import com.projet.heisenburger.repository.PlatRepository;
 import com.projet.heisenburger.repository.RestaurantRepository;
@@ -49,6 +51,9 @@ public class AdminController {
 
     @Autowired
     private PlatRepository platRepository;
+
+    @Autowired
+    private CategorieRepository categorieRepository;
 
     /**
      * Vérifie si l'utilisateur connecté est un administrateur.
@@ -260,6 +265,8 @@ public class AdminController {
             model.addAttribute("restaurant", restaurant);
             model.addAttribute("plats", platRepository.findByRestaurant(restaurant));
             model.addAttribute("pageTitle", "Gérer le Menu de " + restaurant.getNom());
+            List<Categorie> categories = categorieRepository.findAll();
+            model.addAttribute("allCategories", categories);
             return "admin/admin_restaurant_menu";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Restaurant non trouvé.");
@@ -290,6 +297,8 @@ public class AdminController {
             model.addAttribute("restaurant", restaurantOpt.get());
             model.addAttribute("plat", new Plat());
             model.addAttribute("pageTitle", "Ajouter un nouveau plat au menu de " + restaurantOpt.get().getNom());
+            List<Categorie> categories = categorieRepository.findAll();
+            model.addAttribute("allCategories", categories);
             return "admin/admin_plat_form";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Restaurant non trouvé.");
@@ -314,7 +323,7 @@ public class AdminController {
         if (admin == null) {
             return "redirect:/login";
         }
-
+        
         Optional<Restaurant> restaurantOpt = restaurantRepository.findByIdRestaurant(idRestaurant);
         if (restaurantOpt.isPresent()) {
             Restaurant restaurant = restaurantOpt.get();

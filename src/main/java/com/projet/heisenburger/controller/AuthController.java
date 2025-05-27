@@ -4,7 +4,6 @@ import com.projet.heisenburger.model.Admin;
 import com.projet.heisenburger.model.Client;
 import com.projet.heisenburger.model.Restaurant;
 import com.projet.heisenburger.model.User;
-import com.projet.heisenburger.repository.CommandeRepository;
 import com.projet.heisenburger.repository.RestaurantRepository;
 import com.projet.heisenburger.repository.UserRepository;
 import com.projet.heisenburger.service.AuthService;
@@ -18,10 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.projet.heisenburger.model.Commande;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -30,8 +27,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    private CommandeRepository commandeRepository;
 
     @Autowired
     private RestaurantRepository restaurantRepository;

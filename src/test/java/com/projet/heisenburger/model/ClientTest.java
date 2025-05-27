@@ -40,7 +40,7 @@ public class ClientTest {
         assertEquals(prenom, client.getPrenom());
         assertEquals(adresse, client.getAdresse());
         assertEquals(ville, client.getVille());
-        assertNotNull(client.getDateInscription()); // Date should be set on creation
+        assertNotNull(client.getDateInscription());
         assertEquals("actif", client.getStatut());
     }
 

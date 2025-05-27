@@ -1,74 +1,190 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Gestion des Plats - <th:block th:text="${restaurantName ?: 'Mon Restaurant'}"></th:block></title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Plats - <th:block th:text="${restaurantName ?: 'Mon Restaurant'}"></th:block></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        .non-disponible {
-            background-color: #fdd; /* Rouge clair pour non disponible */
+        :root {
+            --primary-gradient: linear-gradient(to bottom right, #e70b03, #e6870b);
+            --card-shadow-fade: 0 4px 50px rgba(230, 135, 11, 0.3);
+            --text-dark: #333;
+            --text-light: #f1f1f1;
+            --primary-color: #e70b03;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            --card-border: 1px solid rgba(255, 255, 255, 0.18);
         }
-        .table th, .table td {
-            vertical-align: middle;
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--primary-gradient);
+            padding-top: 80px;
         }
+        .navbar { /* Style Glassmorphism de l'admin */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: var(--card-border);
+            box-shadow: var(--card-shadow);
+        }
+        .navbar-brand img { max-height: 40px; }
+        .navbar .nav-link, .navbar .navbar-text, .navbar-brand span, .navbar-brand {
+            color: var(--text-light) !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .navbar .btn-outline-light {
+            color: var(--text-light) !important;
+            border-color: rgba(255,255,255,0.5);
+        }
+         .navbar .btn-outline-light:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .main-content-card {
+            background: #ffffff;
+            color: var(--text-dark);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow-fade);
+            padding: 30px 40px;
+            width: 100%;
+            max-width: 1100px; /* Plus large pour la table */
+            margin: 2rem auto; /* Centrer la carte avec marges */
+        }
+        .main-content-card h1 {
+            color: var(--text-dark);
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.75rem;
+        }
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary-custom:hover {
+            background-color: #c40a03;
+            border-color: #c40a03;
+        }
+        .table th {
+            background-color: #343a40; /* Fond foncé pour l'en-tête */
+            color: white;
+        }
+        .table .img-plat {
+            max-width: 70px; max-height: 70px; border-radius: 0.25rem; object-fit: cover;
+        }
+        .actions-cell .btn { margin: 0 2px; }
+
+        .alert-container { position: fixed; top: 80px; width: 50%; left: 25%; z-index: 1050; }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Liste des plats de <th:block th:text="${restaurantName ?: 'votre restaurant'}"></th:block></h2>
-        <a th:href="@{/restaurant/dashboard}" class="btn btn-secondary">Retour au Dashboard</a>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/restaurant/dashboard}">
+            <img src="/images/Heisenberg.svg" alt="Heisenburger Logo">
+            <span th:if="${session.user?.nom}" th:text="${session.user.nom}" class="ms-2"></span>
+            <span th:unless="${session.user?.nom}" th:text="${session.user?.email}" class="ms-2"></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#restaurantNavbar"
+                aria-controls="restaurantNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon" style="filter: invert(1) brightness(2);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="restaurantNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/restaurant/dashboard}"><i class="bi bi-speedometer2"></i> Tableau de Bord</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/restaurant/plats}"><i class="bi bi-card-list"></i> Mes Plats</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/logout}" class="btn btn-sm btn-outline-light ms-lg-2">
+                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
+</nav>
 
-    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
-
-    <p><a th:href="@{/restaurant/plats/new}" class="btn btn-primary mb-3">Ajouter un nouveau plat</a></p>
-
-    <div th:if="${plats == null or plats.isEmpty()}">
-        <p>Aucun plat n'a été ajouté pour le moment.</p>
+<div class="alert-container">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-
-    <table class="table table-striped table-bordered" th:unless="${plats == null or plats.isEmpty()}">
-        <thead class="thead-dark">
-        <tr>
-            <th>Nom</th>
-            <th>Description</th>
-            <th>Prix</th>
-            <th>Disponible</th>
-            <th>Image</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="plat : ${plats}" th:classappend="${!plat.disponible} ? 'non-disponible' : ''">
-            <td th:text="${plat.nom}">Nom du plat</td>
-            <td th:text="${plat.description}">Description du plat</td>
-            <td th:text="${#numbers.formatDecimal(plat.prix, 1, 'COMMA', 2, 'POINT')} + ' €'">0.00 €</td>
-            <td>
-                <span th:if="${plat.disponible}" class="badge badge-success">Oui</span>
-                <span th:unless="${plat.disponible}" class="badge badge-danger">Non</span>
-            </td>
-            <td>
-                <img th:if="${plat.imageUrl != null AND !plat.imageUrl.isEmpty()}"
-                     th:src="${plat.imageUrl}" alt="Image du plat" style="max-width: 100px; max-height: 100px;">
-                <span th:unless="${plat.imageUrl != null AND !plat.imageUrl.isEmpty()}">N/A</span>
-            </td>
-            <td>
-                <a th:href="@{'/restaurant/plats/edit/' + ${plat.id}}" class="btn btn-sm btn-info">Modifier</a>
-                <a th:href="@{'/restaurant/plats/delete/' + ${plat.id}}"
-                   class="btn btn-sm btn-danger"
-                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce plat ?');">Supprimer</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <p><a href="/logout" th:href="@{/logout}" class="btn btn-outline-danger mt-3">Déconnexion</a></p>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 </div>
 
-<footer class="text-center mt-5 mb-3">
-    <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> <th:block th:text="${restaurantName ?: 'Mon Restaurant'}"></th:block>. Tous droits réservés.</p>
-</footer>
+<div class="container">
+    <div class="main-content-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1><i class="bi bi-card-checklist"></i> Liste des plats de <span th:text="${restaurantName ?: 'votre restaurant'}"></span></h1>
+            <a th:href="@{/restaurant/plats/new}" class="btn btn-primary-custom">
+                <i class="bi bi-plus-circle-fill"></i> Ajouter un plat
+            </a>
+        </div>
 
+        <div th:if="${plats == null or #lists.isEmpty(plats)}" class="alert alert-info">
+            <i class="bi bi-info-circle-fill"></i> Aucun plat n'a été ajouté pour le moment.
+        </div>
+
+        <div class="table-responsive" th:unless="${plats == null or #lists.isEmpty(plats)}">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Nom</th>
+                    <th>Catégorie</th>
+                    <th>Description</th>
+                    <th class="text-end">Prix</th>
+                    <th class="text-center">Disponible</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="plat : ${plats}">
+                    <td>
+                        <img th:if="${plat.imageUrl != null AND !#strings.isEmpty(plat.imageUrl)}"
+                             th:src="${plat.imageUrl}" alt="Image du plat" class="img-plat">
+                        <span th:unless="${plat.imageUrl != null AND !#strings.isEmpty(plat.imageUrl)}" class="text-muted fst-italic">N/A</span>
+                    </td>
+                    <td th:text="${plat.nom}">Nom du plat</td>
+                    <td th:text="${plat.categorie?.nom ?: 'N/A'}">Catégorie</td>
+                    <td th:text="${plat.description}" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:title="${plat.description}">Description</td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(plat.prix, 1, 'COMMA', 2, 'POINT')} + ' €'">0.00 €</td>
+                    <td class="text-center">
+                        <span th:if="${#strings.equalsIgnoreCase(plat.disponible, 'true') || plat.disponible == true}" class="badge bg-success">Oui</span>
+                        <span th:unless="${#strings.equalsIgnoreCase(plat.disponible, 'true') || plat.disponible == true}" class="badge bg-danger">Non</span>
+                    </td>
+                    <td class="text-center actions-cell">
+                        <a th:href="@{'/restaurant/plats/edit/' + ${plat.id}}" class="btn btn-sm btn-outline-primary" title="Modifier"><i class="bi bi-pencil-fill"></i></a>
+                        <form th:action="@{'/restaurant/plats/delete/' + ${plat.id}}" method="get" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce plat ?');">
+                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="bi bi-trash-fill"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+         <div class="mt-4">
+             <a th:href="@{/restaurant/dashboard}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Retour au Tableau de Bord
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
